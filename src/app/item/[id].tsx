@@ -143,7 +143,7 @@ export default function ItemScreen() {
                     <View style={{ flex: 1 }}>
                       <AppText variant="body">{formatLocal(r.scheduledAt)}</AppText>
                       <AppText variant="caption" tone="tertiary">
-                        {r.title} · {!r.enabled ? '꺼짐 (보관·완료된 항목)' : r.notificationId ? '기기 알림 예약됨' : '앱 안에서만 표시 (알림 권한 없음)'}
+                        {r.title} · {!r.enabled ? '꺼짐 (보관·완료된 항목)' : r.notificationId ? '기기 알림 예약됨' : '앱 안에서만 표시 (기기 알림 없음)'}
                       </AppText>
                     </View>
                     <IconButton icon="trash-outline" label="알림 삭제" onPress={() => act(() => deleteReminder(r.id), '알림을 삭제했어요.')} />

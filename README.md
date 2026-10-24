@@ -121,3 +121,23 @@ docs/                아키텍처·결정·POC·개인정보·위협 모델·라
 - 개인 자료: 저장소·테스트·문서에 실제 영수증/대화/계정 화면 없음.
 
 **다음 우선순위**: Android development build 공유 수신 POC → Android ML Kit 한국어 OCR POC → 기기 알림 검증 → 앱 전환 화면 가림·오픈소스 고지 화면 → iOS EAS 빌드.
+
+### 2026-10-24 — 실기기(Galaxy Z Flip5) 연결 시도, Expo Go 호환 수정, 테스트용 APK
+
+**환경 확인**
+- USB 연결 기기: Samsung Galaxy Z Flip5 (`SM-F731N`), adb 인식 정상. Android SDK는 `%LOCALAPPDATA%\Android\Sdk`, 빌드에는 JDK 17 사용(시스템 `JAVA_HOME`은 JDK 1.8이라 그대로는 빌드 불가).
+- `npx expo prebuild --platform android` 결과 AndroidManifest에 공유 수신 intent filter 생성 확인: `ACTION_SEND`(text/plain, image/*, application/pdf), `ACTION_SEND_MULTIPLE`(image/*). 앱에서 실제 공유 수신 동작은 아직 미확인.
+
+**Expo Go 테스트 결과**
+- 폰의 Expo Go 58.0.5로 Metro(`expo start --go`, USB `adb reverse`)에 연결해 실행 → `expo-notifications` import 시 `ExpoTopicSubscriptionModule` 네이티브 모듈이 없어 **앱이 시작되지 않음**.
+- 수정(D-013): 알림 모듈을 지연 로딩하고, Expo Go에서는 기기 알림 대신 "이 실행 환경에서는 기기 알림을 쓸 수 없어요" 안내 + 기한 탭 표시로 대체. 수정 후 Expo Go 화면 재확인은 사용자 요청으로 중단(→ APK로 전환).
+- Expo Go에는 딸깍 전용 공유 intent가 포함되지 않으므로, 다른 앱 공유 메뉴에 "딸깍"이 뜨는지는 Expo Go로 검증할 수 없음.
+
+**테스트용 APK (D-014)**
+- `android/gradlew assembleRelease`로 JS 번들을 포함한 단독 실행 APK 빌드(디버그 키 서명, 테스트 전용). 생성 위치: `android/app/build/outputs/apk/release/app-release.apk` (android 폴더는 CNG 산출물이라 git에 포함하지 않음).
+
+**변경 파일**: `src/infrastructure/notifications/local-notifications.ts`(+`.web.ts`), `src/components/items/ReminderSheet.tsx`, `src/app/(tabs)/reminders.tsx`, `src/app/item/[id].tsx`, `docs/DECISIONS.md`, `docs/TESTING.md`, `README.md`
+
+**실행한 명령과 결과**
+- `npx jest` — 124 통과 / 0 실패, `npx tsc --noEmit` — 통과, `npx expo lint` — 통과
+- 실기기 기능 테스트(공유 수신·사진/파일 선택·알림): **미실행** — 사용자가 APK로 직접 확인 예정

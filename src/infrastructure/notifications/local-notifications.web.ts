@@ -1,14 +1,18 @@
 /** Web preview: local notifications are not supported; reminders stay visible in the 기한 tab. */
-export type PermissionState = 'granted' | 'denied' | 'undetermined';
+export type PermissionState = 'granted' | 'denied' | 'undetermined' | 'unavailable';
+
+export function notificationsAvailable(): boolean {
+  return false;
+}
 
 export function configureNotifications(): void {}
 
 export async function getPermission(): Promise<PermissionState> {
-  return 'denied';
+  return 'unavailable';
 }
 
 export async function requestPermission(): Promise<PermissionState> {
-  return 'denied';
+  return 'unavailable';
 }
 
 export async function scheduleAt(_localDateTime: string, _title: string, _body: string, _itemId: string): Promise<string> {

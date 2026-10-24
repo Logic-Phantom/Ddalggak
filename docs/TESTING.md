@@ -28,6 +28,15 @@ npx expo-doctor
 - E2E(Detox 등) 미구성.
 - 통합 테스트(SQLite 리포지토리)는 jest 환경에서 expo-sqlite 네이티브가 없어 미작성 — development build 위 계측 테스트 또는 SQLite 대체 드라이버 도입 필요.
 
+## 2026-10-24 실기기 연결 (Galaxy Z Flip5, SM-F731N)
+| 항목 | 결과 |
+|---|---|
+| adb 연결 | 정상 |
+| prebuild 매니페스트 | 공유 intent filter(SEND/SEND_MULTIPLE) 생성 확인 |
+| Expo Go 58.0.5 실행 | **실패** — `ExpoTopicSubscriptionModule` 없음 → 알림 모듈 지연 로딩으로 수정(D-013), 수정 후 재확인은 미실행 |
+| 테스트용 release APK | Gradle 빌드 (결과는 README Work Log 참고) |
+| 공유 수신·선택기·알림 실동작 | 미검증 (사용자가 APK로 확인 예정) |
+
 ## 스크린샷
 - `docs/screenshots/01-web-inbox-empty-light.jpg` (웹, 375×812 에뮬레이션, 라이트)
 - 나머지 화면은 웹 프리뷰 창이 가려져 캡처가 실패해 저장하지 못함(위 흐름은 확인함).

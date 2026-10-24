@@ -61,5 +61,14 @@
 ## D-011 · 저장소 라이선스 미지정 (2026-10-24)
 - 저장소 LICENSE 파일은 소유자가 정할 사항이라 임의로 추가하지 않음. 공개 저장소에 LICENSE가 없으면 기본적으로 "모든 권리 보유"로 해석됨.
 
+## D-013 · expo-notifications 지연 로딩 (2026-10-24)
+- **문제**: 폰의 Expo Go(58.0.5, Android)에서 `expo-notifications`를 import하는 순간 `Cannot find native module 'ExpoTopicSubscriptionModule'`로 앱 전체가 시작되지 않음. 58.0.11로 내려도 같은 모듈이 포함돼 있어 버전 문제가 아님 → 버전은 `~58.1.6` 유지.
+- **결정**: `local-notifications.ts`에서 Expo Go(`ExecutionEnvironment.StoreClient`)일 때는 불러오지 않고, 그 외에는 `require`를 try/catch로 감싸 지연 로딩. 실패 시 권한 상태를 `unavailable`로 보고하고 알림은 앱 안(기한 탭)에서만 표시.
+- **영향**: Expo Go에서는 기기 알림 없음(안내 문구 표시). 설치형 APK/development build에서는 정상 경로.
+
+## D-014 · 테스트용 APK는 로컬 Gradle release 빌드 (2026-10-24)
+- `npx expo prebuild --platform android --clean` 후 `android/gradlew assembleRelease` (JDK 17 지정). Expo 템플릿 기본값대로 **디버그 키로 서명** — 사내 테스트용이며 스토어 배포용이 아님. 스토어용은 업로드 키 생성 후 EAS/서명 설정 필요.
+- 이 PC의 `JAVA_HOME`이 JDK 1.8을 가리키므로 빌드 시 `C:\Program Files\Microsoft\jdk-17.0.20.101-hotspot`을 지정해야 함.
+
 ## D-012 · 웹 타깃은 UI 확인용 (2026-10-24)
 - `expo start --web`은 레이아웃·흐름 점검용. 공유 수신/알림/파일 복사는 웹에서 동작하지 않음(`.web.ts` 대체 구현). 출시 대상 아님.

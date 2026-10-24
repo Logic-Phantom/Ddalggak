@@ -46,6 +46,9 @@ export default function RemindersScreen() {
   return (
     <ScreenScroll topInset>
       <AppText variant="screenTitle">기한</AppText>
+      {data?.permission === 'unavailable' ? (
+        <InlineMessage tone="info" message="이 실행 환경에서는 기기 알림을 쓸 수 없어요. 아래 일정은 앱 안에서만 보여요." />
+      ) : null}
       {data?.permission === 'denied' && data.reminders.length ? (
         <InlineMessage
           tone="warning"
