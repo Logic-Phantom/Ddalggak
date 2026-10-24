@@ -10,11 +10,14 @@ function isLocalUri(value: string): boolean {
 function nameFromUri(uri: string): string | null {
   const last = uri.split(/[\\/]/).pop();
   if (!last) return null;
+  let name: string;
   try {
-    return decodeURIComponent(last.split('?')[0]);
+    name = decodeURIComponent(last.split('?')[0]);
   } catch {
-    return last;
+    name = last;
   }
+  // MediaStore URIs end in a numeric id (content://media/.../1000021865), not a file name.
+  return /\.[A-Za-z0-9]{2,5}$/.test(name) ? name : null;
 }
 
 /**

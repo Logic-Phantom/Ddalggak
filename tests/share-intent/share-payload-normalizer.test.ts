@@ -29,6 +29,11 @@ describe('share payload normalizer', () => {
     ]);
   });
 
+  it('does not show a MediaStore id as the file name', () => {
+    const r = normalizeSharePayloads([{ shareType: 'image', value: 'content://media/external/images/media/1000021865', mimeType: 'image/png' }]);
+    expect(r.inputs[0]).toMatchObject({ kind: 'file', name: null, mimeType: 'image/png' });
+  });
+
   it('rejects empty, remote, video/audio and non-http payloads with a reason', () => {
     const r = normalizeSharePayloads([
       { shareType: 'text', value: '   ' },

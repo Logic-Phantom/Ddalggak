@@ -148,7 +148,23 @@ docs/                아키텍처·결정·POC·개인정보·위협 모델·라
 - 원인(logcat): `NativeTabs.Trigger.Icon 'md' icons on Android require 'expo-symbols'` — 하단 탭의 Android 머티리얼 아이콘에 필요한 `expo-symbols`가 빠져 있었음(CutPick에서 옮길 때 누락). 웹 프리뷰는 JS 탭을 써서 드러나지 않았음.
 - 수정: `npx expo install expo-symbols`(`~58.0.4`). jest 124 통과, tsc 통과, expo-doctor 20/20.
 - 재빌드: https://expo.dev/artifacts/eas/nJcyZW0xtz8Btp8wNOOe9WvthwbCOAZmWojydIEyWAs.apk (빌드 234787bd)
-- Galaxy Z Flip5에 adb로 설치·실행: `Running "main"` 이후 크래시 로그 없음, 프로세스 유지 확인. 폰 화면이 잠겨 있어 UI 표시 확인은 미실행.
+- Galaxy Z Flip5에 adb로 설치·실행: `Running "main"` 이후 크래시 로그 없음, 프로세스 유지 확인.
+
+### 2026-10-24 — 실기기 화면·공유 수신 테스트 (Galaxy Z Flip5, 빌드 234787bd APK)
+
+| 테스트 | 방법 | 결과 |
+|---|---|---|
+| 첫 화면 | 앱 실행 | ✅ 인박스·안내 카드·네이티브 하단 탭 정상 표시 |
+| 텍스트+링크 공유 (앱 종료 상태) | `am start -a SEND -t text/plain` (카카오톡 텍스트 공유와 같은 intent) | ✅ 추가하기 화면으로 바로 열림 → 정리하기 → 분류 "예약" 후보, 예약일 2026.11.02 19:00(근거 분명), 예약번호 추출, 제목의 번호 마스킹 → 확인·저장 → 상세에서 번호 기본 가림 |
+| 시스템 등록 | `cmd package query-activities -a SEND` | ✅ image/png, text/plain 모두 `app.ddalggak.mobile/.MainActivity` 등록 |
+| 이미지 공유 (adb intent, content://media) | `am start -a SEND --eu EXTRA_STREAM ... --grant-read-uri-permission` | ⚠️ 받은 내용 표시는 됨. 정리하기 시 `file-access-lost`. 시스템에 URI 권한 기록이 없음 → 셸이 미디어 권한을 대신 줄 수 없는 테스트 한계로 추정(앱 버그 여부 미확정) |
+| 갤러리 앱 → 공유 시트 | 삼성 갤러리에서 가상 쿠폰 이미지 공유 | ❌ 삼성 공유 시트의 앱 줄(퀵 셰어·카카오톡·Drive·Gmail·Instagram·Google 포토·Outlook·Discord·블루투스·인쇄)에 **딸깍이 보이지 않음**. 원인 미확인 |
+
+이번에 고친 것 (테스트 125개 통과, **아직 APK에 미반영**)
+- MediaStore 공유 시 파일 이름 자리에 미디어 번호(`1000021865`)가 보이던 문제 → 확장자 없는 이름은 표시하지 않음.
+- 공유 파일 복사 실패 대비: 새 `File.copy`가 실패하면 `expo-file-system/legacy`의 `copyAsync`(ContentResolver 스트림)로 한 번 더 시도.
+
+테스트에 쓴 가상 이미지는 폰에서 삭제함. 공유 시트 조사 중 하단 앱 영역만 캡처하려다 연락처 바로가기 줄이 일부 포함된 캡처가 생겨 즉시 삭제함(저장소·문서에 포함 안 됨).
 
 **변경 파일**: `app.json`, `src/infrastructure/notifications/local-notifications.ts`(+`.web.ts`), `src/components/items/ReminderSheet.tsx`, `src/app/(tabs)/reminders.tsx`, `src/app/item/[id].tsx`, `docs/DECISIONS.md`, `docs/TESTING.md`, `README.md`
 

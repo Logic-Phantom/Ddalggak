@@ -1,4 +1,5 @@
 import { Directory, File, Paths } from 'expo-file-system';
+import * as LegacyFS from 'expo-file-system/legacy';
 
 import { AppError } from '@/domain/errors';
 
@@ -16,14 +17,20 @@ function dir(...parts: string[]): Directory {
 
 /** Copies a shared/picked file into app storage. `fileName` must already be sanitized. */
 export async function importFile(sourceUri: string, itemId: string, fileName: string): Promise<{ uri: string; size: number | null }> {
+  const target = new File(dir('attachments', itemId), fileName);
   try {
-    const source = new File(sourceUri);
-    const target = new File(dir('attachments', itemId), fileName);
     if (target.exists) target.delete();
-    await source.copy(target);
+    await new File(sourceUri).copy(target);
     return { uri: target.uri, size: target.size ?? null };
-  } catch (e) {
-    throw new AppError('file-access-lost', undefined, e);
+  } catch (first) {
+    // Some providers (MediaStore, other apps' FileProviders) only open via ContentResolver streams;
+    // the legacy copy reads content:// that way. Try it once before giving up.
+    try {
+      await LegacyFS.copyAsync({ from: sourceUri, to: target.uri });
+      return { uri: target.uri, size: target.size ?? null };
+    } catch (e) {
+      throw new AppError('file-access-lost', undefined, e ?? first);
+    }
   }
 }
 
