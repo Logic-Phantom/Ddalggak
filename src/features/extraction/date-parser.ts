@@ -30,13 +30,13 @@ const WEEKDAY_CHARS = '일월화수목금토';
 const ROLE_RULES: [RegExp, DateRole][] = [
   [/(반품|교환(?!권)|환불)/, 'return-deadline'],
   [/(보증\s*기간|품질\s*보증|보증\s*만료|무상\s*(수리|A\/S))/, 'warranty-end'],
-  [/(유효\s*기간|유효기한|만료|사용\s*기한|사용\s*기간|사용\s*가능\s*기간|기한)/, 'expiry'],
-  [/(예약|체크인|체크아웃|입실|퇴실|이용\s*일|탑승|출발|도착\s*시각)/, 'reservation'],
-  [/(주문)/, 'order'],
+  [/(유효\s*기간|유효기한|만료|사용\s*기한|사용\s*기간|사용\s*가능\s*기간|기한|valid\s+(?:until|thru|through)|expir(?:es|y|ation)|\bexp\b)/i, 'expiry'],
+  [/(예약|체크인|체크아웃|입실|퇴실|이용\s*일|탑승|출발|도착\s*시각|reservation|booking|check-?in|check-?out|departure)/i, 'reservation'],
+  [/(주문|order\s*date)/i, 'order'],
   [/(구매|구입|결제|거래\s*일시|거래일|승인\s*일시)/, 'purchase'],
   [/(배송|도착\s*예정|수령)/, 'delivery'],
   [/(발행|발급|작성일)/, 'issue'],
-  [/(행사|일시|공연|전시|모임|개최|일정|축제|세미나)/, 'event'],
+  [/(행사|일시|공연|전시|모임|개최|일정|축제|세미나|concert|event|show|festival)/i, 'event'],
 ];
 
 interface RawMatch {

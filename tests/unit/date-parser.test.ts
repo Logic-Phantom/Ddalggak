@@ -114,6 +114,12 @@ describe('date parser — time and role', () => {
     expect(parse(input)[0].role).toBe(role);
   });
 
+  it('reads English labels', () => {
+    expect(parse('Valid until 2026.12.31')[0].role).toBe('expiry');
+    expect(parse('Check-in 2026-12-20 15:00')[0].role).toBe('reservation');
+    expect(parse('Concert 2026.11.15 19:30')[0].role).toBe('event');
+  });
+
   it('uses the label nearest to the date ("교환권" is not a return policy)', () => {
     expect(parse('[모바일 교환권] 쿠폰번호: 1234 유효기간 2026.12.31까지')[0].role).toBe('expiry');
     expect(parse('교환/반품 마감 2026.10.20')[0].role).toBe('return-deadline');

@@ -3,6 +3,7 @@ import { useRouter } from 'expo-router';
 import { Tabs } from 'expo-router/js-tabs';
 import type { ComponentProps } from 'react';
 import { Pressable, StyleSheet, View, type ColorValue } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { elevation, fonts, useColors } from '@/design-system';
 
@@ -34,20 +35,22 @@ function AddButton() {
 /** 홈 · 보관함 · (+) · 알림 · 마이페이지. JS tabs on every platform so the center action can be custom. */
 export default function TabsLayout() {
   const c = useColors();
+  // Android draws the app edge-to-edge: the bar must sit above the system navigation buttons.
+  const insets = useSafeAreaInsets();
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: c.accent,
         tabBarInactiveTintColor: c.textTertiary,
-        tabBarStyle: { backgroundColor: c.surface, borderTopColor: c.border, height: 64, paddingTop: 6 },
+        tabBarStyle: { backgroundColor: c.surface, borderTopColor: c.border, height: 64 + insets.bottom, paddingTop: 6, paddingBottom: insets.bottom + 6 },
         tabBarLabelStyle: { fontFamily: fonts.semibold, fontSize: 11 },
       }}>
-      <Tabs.Screen name="index" options={{ title: '홈', tabBarIcon: icon('home-outline', 'home') }} />
-      <Tabs.Screen name="library" options={{ title: '보관함', tabBarIcon: icon('folder-open-outline', 'folder-open') }} />
+      <Tabs.Screen name="index" options={{ title: '홈', tabBarAccessibilityLabel: '홈', tabBarIcon: icon('home-outline', 'home') }} />
+      <Tabs.Screen name="library" options={{ title: '보관함', tabBarAccessibilityLabel: '보관함', tabBarIcon: icon('folder-open-outline', 'folder-open') }} />
       <Tabs.Screen name="add" options={{ title: '추가', tabBarButton: () => <AddButton /> }} />
-      <Tabs.Screen name="reminders" options={{ title: '알림', tabBarIcon: icon('notifications-outline', 'notifications') }} />
-      <Tabs.Screen name="me" options={{ title: '마이', tabBarIcon: icon('person-outline', 'person') }} />
+      <Tabs.Screen name="reminders" options={{ title: '알림', tabBarAccessibilityLabel: '알림', tabBarIcon: icon('notifications-outline', 'notifications') }} />
+      <Tabs.Screen name="me" options={{ title: '마이', tabBarAccessibilityLabel: '마이페이지', tabBarIcon: icon('person-outline', 'person') }} />
     </Tabs>
   );
 }

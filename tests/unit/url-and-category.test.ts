@@ -35,6 +35,11 @@ describe('category classifier', () => {
     expect(categoryHint(top)).toBe('쿠폰일 가능성이 높아요');
   });
 
+  it('understands common English wording', () => {
+    expect(classify({ text: 'Concert 2026.11.15 19:30 ticket' })[0].category).toMatch(/ticket|event/);
+    expect(classify({ text: 'Coupon voucher valid until 2026.12.31' })[0].category).toBe('coupon');
+  });
+
   it('uses domains as hints', () => {
     expect(classify({ text: '', domain: 'map.naver.com' })[0].category).toBe('place');
     expect(classify({ text: '', domain: 'coupang.com' })[0].category).toBe('shopping');

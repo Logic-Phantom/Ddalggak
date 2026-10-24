@@ -269,8 +269,7 @@ export async function searchItems(terms: string[], filter: { statuses: ItemStatu
     )`);
     params.push(p, p, p, p, p, p, p);
   }
-  const rows = await db.getAllAsync<ItemRow>(`SELECT * FROM items WHERE ${where.join(' AND ')} ORDER BY updated_at DESC LIMIT 200`, ...params);
-  return withTags(rows);
+  const rows = await db.getAllAsync<ItemRow>(`SELECT * FROM items WHERE ${where.join(' AND ')} ORDER BY updated_at DESC LIMIT 200`, ...params);  return withTags(rows);
 }
 
 export async function findByUrlKey(urlKey: string, excludeId?: string): Promise<InboxItem[]> {

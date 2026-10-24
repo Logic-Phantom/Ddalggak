@@ -1,7 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import * as Clipboard from 'expo-clipboard';
 import { Image } from 'expo-image';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
@@ -124,6 +124,7 @@ export default function CaptureScreen() {
 
   return (
     <View style={{ flex: 1 }}>
+      <Stack.Screen options={{ title: adopted || params.source === 'share' ? '공유받은 정보' : '새 정보 추가' }} />
       <ScreenScroll withBottomBar>
         {shareNotice ? <InlineMessage tone={shareNotice.tone} message={shareNotice.text} /> : null}
         {notice ? <InlineMessage tone={notice.tone} message={notice.text} /> : null}
