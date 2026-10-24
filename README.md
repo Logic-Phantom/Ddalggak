@@ -136,7 +136,14 @@ docs/                아키텍처·결정·POC·개인정보·위협 모델·라
 **테스트용 APK (D-014)**
 - `android/gradlew assembleRelease`로 JS 번들을 포함한 단독 실행 APK 빌드(디버그 키 서명, 테스트 전용). 생성 위치: `android/app/build/outputs/apk/release/app-release.apk` (android 폴더는 CNG 산출물이라 git에 포함하지 않음).
 
-**변경 파일**: `src/infrastructure/notifications/local-notifications.ts`(+`.web.ts`), `src/components/items/ReminderSheet.tsx`, `src/app/(tabs)/reminders.tsx`, `src/app/item/[id].tsx`, `docs/DECISIONS.md`, `docs/TESTING.md`, `README.md`
+**로컬 APK 빌드 결과**: 4회 모두 실패. 원인은 사용자 폴더 경로의 한글(`C:\Users\서현`)로, Gradle 캐시·임시 폴더·SDK를 영문 경로로 우회하자 단계는 진행됐지만 마지막에 NDK clang이 링커를 실행하지 못함(`unable to execute command`). → EAS 빌드로 전환.
+
+**EAS 빌드 (성공)**
+- `npx eas-cli@latest init` — `@lcm2/ddalggak` 프로젝트 생성·연결(app.json에 projectId/owner 추가), Android 키스토어는 EAS 서버 보관.
+- `npx eas-cli@latest build --platform android --profile preview` → **FINISHED**, APK: https://expo.dev/artifacts/eas/HzGKPyc2NjZHacT1L2-U12U89egMSlL2PDkhQIOZpTg.apk (빌드 페이지: https://expo.dev/accounts/lcm2/projects/ddalggak/builds/85840c36-32de-4501-adad-990de11bcfc9)
+- 폰 설치·기능 확인은 사용자가 직접 진행 예정(미검증).
+
+**변경 파일**: `app.json`, `src/infrastructure/notifications/local-notifications.ts`(+`.web.ts`), `src/components/items/ReminderSheet.tsx`, `src/app/(tabs)/reminders.tsx`, `src/app/item/[id].tsx`, `docs/DECISIONS.md`, `docs/TESTING.md`, `README.md`
 
 **실행한 명령과 결과**
 - `npx jest` — 124 통과 / 0 실패, `npx tsc --noEmit` — 통과, `npx expo lint` — 통과
