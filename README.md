@@ -158,7 +158,7 @@ docs/                아키텍처·결정·POC·개인정보·위협 모델·라
 | 텍스트+링크 공유 (앱 종료 상태) | `am start -a SEND -t text/plain` (카카오톡 텍스트 공유와 같은 intent) | ✅ 추가하기 화면으로 바로 열림 → 정리하기 → 분류 "예약" 후보, 예약일 2026.11.02 19:00(근거 분명), 예약번호 추출, 제목의 번호 마스킹 → 확인·저장 → 상세에서 번호 기본 가림 |
 | 시스템 등록 | `cmd package query-activities -a SEND` | ✅ image/png, text/plain 모두 `app.ddalggak.mobile/.MainActivity` 등록 |
 | 이미지 공유 (adb intent, content://media) | `am start -a SEND --eu EXTRA_STREAM ... --grant-read-uri-permission` | ⚠️ 받은 내용 표시는 됨. 정리하기 시 `file-access-lost`. 시스템에 URI 권한 기록이 없음 → 셸이 미디어 권한을 대신 줄 수 없는 테스트 한계로 추정(앱 버그 여부 미확정) |
-| 갤러리 앱 → 공유 시트 | 삼성 갤러리에서 가상 쿠폰 이미지 공유 | ❌ 삼성 공유 시트의 앱 줄(퀵 셰어·카카오톡·Drive·Gmail·Instagram·Google 포토·Outlook·Discord·블루투스·인쇄)에 **딸깍이 보이지 않음**. 원인 미확인 |
+| 갤러리 앱 → 공유 시트 | 삼성 갤러리에서 가상 쿠폰 이미지 공유 | ✅ 첫 앱 줄(추천 앱)에는 없고 **"더보기"에 표시됨** (사용자 확인). 삼성 공유 시트가 아직 쓰지 않은 앱을 더보기에 두는 동작으로, 앱 문제 아님 |
 
 이번에 고친 것 (테스트 125개 통과, **아직 APK에 미반영**)
 - MediaStore 공유 시 파일 이름 자리에 미디어 번호(`1000021865`)가 보이던 문제 → 확장자 없는 이름은 표시하지 않음.
