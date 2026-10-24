@@ -26,7 +26,7 @@ import {
 import { CATEGORY_INFO, fieldLabel } from '@/domain/categories';
 import { toUserMessage } from '@/domain/errors';
 import { CATEGORIES, type Category, type ExtractedField, type FieldType, type ItemDetail } from '@/domain/models';
-import { categoryHint, classify } from '@/features/extraction/category-classifier';
+import { categoryHint, classify, fieldSignal } from '@/features/extraction/category-classifier';
 import { formatMoney, toMinor } from '@/features/extraction/money-parser';
 import { addField, deleteField, updateField } from '@/features/items/item-repository';
 import { confirmDraft } from '@/features/items/item-service';
@@ -98,7 +98,12 @@ export function ItemEditor({ item, mode, reload, onSaved, onCancel, notices }: I
   const [addValue, setAddValue] = useState('');
   const [addError, setAddError] = useState<string | null>(null);
 
-  const suggestion = classify({ text: [item.displayText, item.ocrText].filter(Boolean).join('\n'), domain: item.domain })[0];
+  // Same inputs as the capture pipeline (text, domain and extracted-field signals) so the hint matches.
+  const suggestion = classify({
+    text: [item.displayText, item.ocrText].filter(Boolean).join('\n'),
+    domain: item.domain,
+    fieldSignals: item.fields.map((f) => fieldSignal(f.fieldType, f.role)),
+  })[0];
   const unconfirmed = item.fields.filter((f) => f.requiresConfirmation && !f.userConfirmed && f.fieldType !== 'url');
   const ordered = [...item.fields.filter((f) => f.fieldType !== 'url')].sort((a, b) => Number(b.fieldType === 'date') - Number(a.fieldType === 'date'));
 

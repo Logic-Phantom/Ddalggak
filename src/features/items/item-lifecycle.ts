@@ -19,7 +19,7 @@ export function keepsReminders(status: ItemStatus): boolean {
 
 export const STATUS_LABEL: Record<ItemStatus, string> = {
   draft: '검토 전',
-  active: '보관함',
+  active: '진행 중',
   completed: '완료',
   archived: '보관됨',
 };

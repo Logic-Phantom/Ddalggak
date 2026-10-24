@@ -46,7 +46,7 @@ export default function ItemScreen() {
   const [sheet, setSheet] = useState(false);
   const [message, setMessage] = useState<{ tone: 'success' | 'error' | 'info'; text: string } | null>(saved ? { tone: 'success', text: '저장했어요. 필요하면 알림을 만들어 보세요.' } : null);
 
-  if (item === null) return <EmptyState title="항목을 찾을 수 없어요" message="삭제된 항목일 수 있어요." actionLabel="인박스로" onAction={() => router.replace('/')} />;
+  if (item === null) return <EmptyState title="항목을 찾을 수 없어요" message="삭제된 항목일 수 있어요." actionLabel="홈으로" onAction={() => router.replace('/')} />;
   if (!item) return null;
 
   const cat = CATEGORY_INFO[item.category];
@@ -115,7 +115,7 @@ export default function ItemScreen() {
           </Row>
           <Row gap={spacing.xs} style={{ alignItems: 'flex-start' }}>
             <AppText variant="title" style={{ flex: 1 }} selectable>{item.title}</AppText>
-            <IconButton icon={item.pinned ? 'pin' : 'pin-outline'} label={item.pinned ? '고정 해제' : '인박스 맨 위에 고정'} active={item.pinned} onPress={() => act(() => updateItem(item.id, { pinned: !item.pinned }))} />
+            <IconButton icon={item.pinned ? 'pin' : 'pin-outline'} label={item.pinned ? '고정 해제' : '목록 맨 위에 고정'} active={item.pinned} onPress={() => act(() => updateItem(item.id, { pinned: !item.pinned }))} />
           </Row>
           <AppText variant="caption" tone="tertiary">{formatIsoDate(item.capturedAt)} 저장{item.domain ? ` · ${item.domain}` : ''}</AppText>
           <TagList tags={item.tags.map((t) => ({ label: `#${t}` }))} />
@@ -200,11 +200,11 @@ export default function ItemScreen() {
           <Row gap={spacing.xs}>
             {item.status === 'active' ? (
               <>
-                <SecondaryButton label="완료" icon="checkmark-done-outline" onPress={() => act(() => setStatus(item.id, 'completed'), '완료로 옮겼어요. 알림은 꺼졌어요.')} style={{ flex: 1 }} />
-                <SecondaryButton label="보관" icon="archive-outline" onPress={() => act(() => setStatus(item.id, 'archived'), '보관함으로 옮겼어요. 알림은 꺼졌어요.')} style={{ flex: 1 }} />
+                <SecondaryButton label="완료" icon="checkmark-done-outline" onPress={() => act(() => setStatus(item.id, 'completed'), '완료했어요. 보관함의 완료 탭에서 볼 수 있고, 알림은 꺼졌어요.')} style={{ flex: 1 }} />
+                <SecondaryButton label="보관" icon="archive-outline" onPress={() => act(() => setStatus(item.id, 'archived'), '보관했어요. 보관함의 보관됨 탭에서 볼 수 있고, 알림은 꺼졌어요.')} style={{ flex: 1 }} />
               </>
             ) : (
-              <SecondaryButton label="인박스로 되돌리기" icon="arrow-undo-outline" onPress={() => act(() => setStatus(item.id, 'active'), '인박스로 되돌렸어요. 필요하면 알림을 다시 만들어 주세요.')} style={{ flex: 1 }} />
+              <SecondaryButton label="진행 중으로 되돌리기" icon="arrow-undo-outline" onPress={() => act(() => setStatus(item.id, 'active'), '진행 중으로 되돌렸어요. 필요하면 알림을 다시 만들어 주세요.')} style={{ flex: 1 }} />
             )}
           </Row>
           <DangerButton label="삭제" icon="trash-outline" onPress={confirmDelete} />

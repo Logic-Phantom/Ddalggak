@@ -27,7 +27,7 @@ export default function ReviewScreen() {
     navigation.setOptions({ headerBackVisible: false });
   }, [navigation]);
 
-  if (data && !data.item) return <EmptyState title="항목을 찾을 수 없어요" message="이미 버렸거나 저장된 항목이에요." actionLabel="인박스로" onAction={() => router.replace('/')} />;
+  if (data && !data.item) return <EmptyState title="항목을 찾을 수 없어요" message="이미 버렸거나 저장된 항목이에요." actionLabel="홈으로" onAction={() => router.replace('/')} />;
   if (!data?.item) return null;
   const item = data.item;
 
