@@ -1,0 +1,86 @@
+{
+  "note": "모든 fixture는 직접 작성한 가상(synthetic) 텍스트입니다. 실제 영수증·대화·계정 화면이 아닙니다. 상호/번호/주소는 임의 값입니다.",
+  "today": "2026-10-24",
+  "cases": [
+    {
+      "id": "receipt-cafe",
+      "kind": "한국어 영수증 (합계/부가세/할인/날짜)",
+      "text": "딸깍커피 을지로점\n상호: 딸깍커피\n사업자번호 000-00-00000\n거래일시 2026.10.17 13:05\n아메리카노 2 x 4,500원\n공급가액 8,182원\n부가세 818원\n합계 9,000원\n쿠폰 할인 -1,000원\n결제금액 8,000원\n교환/반품은 7일 이내 영수증 지참",
+      "expect": {
+        "category": "receipt",
+        "dates": [["purchase", "2026-10-17T13:05"]],
+        "amounts": [["unknown", "4500 KRW"], ["supply", "8182 KRW"],["vat", "818 KRW"], ["total", "9000 KRW"], ["discount", "-1000 KRW"], ["paid", "8000 KRW"]],
+        "fields": [["merchant", "딸깍커피"], ["return-policy-text", null]]
+      }
+    },
+    {
+      "id": "coupon-gift",
+      "kind": "쿠폰 이미지 (코드/만료일)",
+      "text": "[모바일 교환권]\n아이스 라떼 Tall\n쿠폰번호: 9988-7766-5544\n유효기간 2026.12.31까지\n사용처: 전국 매장",
+      "expect": {
+        "category": "coupon",
+        "dates": [["expiry", "2026-12-31"]],
+        "fields": [["coupon-code", "9988-7766-5544"]]
+      }
+    },
+    {
+      "id": "reservation-restaurant",
+      "kind": "예약 확인서 (날짜/시간/장소)",
+      "text": "예약이 확정되었습니다\n예약번호 RSV20261102\n예약일 2026년 11월 2일 (월) 오후 7시\n인원 2명\n주소 서울 중구 을지로 123\n문의 02-000-0000",
+      "expect": {
+        "category": "reservation",
+        "dates": [["reservation", "2026-11-02T19:00"]],
+        "fields": [["reservation-number", "RSV20261102"], ["address", "서울 중구 을지로 123"], ["phone", "02-000-0000"]]
+      }
+    },
+    {
+      "id": "event-poster",
+      "kind": "행사 포스터 (기간/주소)",
+      "text": "가을 동네 책 축제\n행사 기간 2026.11.07 ~ 2026.11.08\n장소 서울 마포구 양화로 45\n사전 신청 필수",
+      "expect": {
+        "category": "event",
+        "dates": [["event", "2026-11-07"], ["end", "2026-11-08"]],
+        "fields": [["address", "서울 마포구 양화로 45"]]
+      }
+    },
+    {
+      "id": "warranty-card",
+      "kind": "상품 보증서 (구매일/보증 기간)",
+      "text": "품질보증서\n모델명 DK-100\n구입일 2026.10.01\n보증기간 2027.09.30 까지\n무상 A/S 1년",
+      "expect": {
+        "category": "warranty",
+        "dates": [["purchase", "2026-10-01"], ["warranty-end", "2027-09-30"]]
+      }
+    },
+    {
+      "id": "web-shopping",
+      "kind": "쇼핑 웹 스크린샷/공유 텍스트 (제목/URL/가격)",
+      "text": "[무료배송] 접이식 노트북 거치대 판매가 32,900원 https://www.coupang.com/vp/products/000000?utm_source=share",
+      "expect": {
+        "category": "shopping",
+        "amounts": [["price", "32900 KRW"]],
+        "fields": [["url", "https://www.coupang.com/vp/products/000000?utm_source=share"]]
+      }
+    },
+    {
+      "id": "mixed-ko-en",
+      "kind": "혼합 한국어-영어 / 외화",
+      "text": "Booking Confirmation\nBooking No. BK-55821\nCheck-in 체크인 2026-12-20 15:00\nTotal 합계 210.50 USD",
+      "expect": {
+        "category": "reservation",
+        "dates": [["reservation", "2026-12-20T15:00"]],
+        "amounts": [["total", "21050 USD"]],
+        "fields": [["reservation-number", "BK-55821"]]
+      }
+    },
+    {
+      "id": "ocr-damaged",
+      "kind": "흐린 이미지 OCR 결과 흉내 (전각 숫자/O-0 혼동/깨진 쉼표)",
+      "text": "쿠폰 유효기간 ２０２6.1O.31\n합계 10,00원",
+      "expect": {
+        "dates": [["expiry", "2026-10-31"]],
+        "lowConfidence": ["amount"]
+      }
+    }
+  ]
+}
