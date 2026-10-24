@@ -143,6 +143,13 @@ docs/                아키텍처·결정·POC·개인정보·위협 모델·라
 - `npx eas-cli@latest build --platform android --profile preview` → **FINISHED**, APK: https://expo.dev/artifacts/eas/HzGKPyc2NjZHacT1L2-U12U89egMSlL2PDkhQIOZpTg.apk (빌드 페이지: https://expo.dev/accounts/lcm2/projects/ddalggak/builds/85840c36-32de-4501-adad-990de11bcfc9)
 - 폰 설치·기능 확인은 사용자가 직접 진행 예정(미검증).
 
+**실행 즉시 종료 버그 수정**
+- 증상: 첫 APK를 설치하면 열자마자 앱이 꺼짐.
+- 원인(logcat): `NativeTabs.Trigger.Icon 'md' icons on Android require 'expo-symbols'` — 하단 탭의 Android 머티리얼 아이콘에 필요한 `expo-symbols`가 빠져 있었음(CutPick에서 옮길 때 누락). 웹 프리뷰는 JS 탭을 써서 드러나지 않았음.
+- 수정: `npx expo install expo-symbols`(`~58.0.4`). jest 124 통과, tsc 통과, expo-doctor 20/20.
+- 재빌드: https://expo.dev/artifacts/eas/nJcyZW0xtz8Btp8wNOOe9WvthwbCOAZmWojydIEyWAs.apk (빌드 234787bd)
+- Galaxy Z Flip5에 adb로 설치·실행: `Running "main"` 이후 크래시 로그 없음, 프로세스 유지 확인. 폰 화면이 잠겨 있어 UI 표시 확인은 미실행.
+
 **변경 파일**: `app.json`, `src/infrastructure/notifications/local-notifications.ts`(+`.web.ts`), `src/components/items/ReminderSheet.tsx`, `src/app/(tabs)/reminders.tsx`, `src/app/item/[id].tsx`, `docs/DECISIONS.md`, `docs/TESTING.md`, `README.md`
 
 **실행한 명령과 결과**
