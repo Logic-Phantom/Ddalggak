@@ -446,6 +446,19 @@ export async function deleteAttachmentRow(id: string): Promise<void> {
   await db.runAsync('DELETE FROM attachments WHERE id = ?', id);
 }
 
+/** First image attachment per item (list thumbnails). */
+export async function firstImages(itemIds: string[]): Promise<Map<string, string>> {
+  const out = new Map<string, string>();
+  if (!itemIds.length) return out;
+  const db = await getDb();
+  const rows = await db.getAllAsync<{ item_id: string; local_uri: string }>(
+    `SELECT item_id, local_uri FROM attachments WHERE mime_type LIKE 'image/%' AND item_id IN (${itemIds.map(() => '?').join(',')}) ORDER BY created_at, rowid`,
+    ...itemIds,
+  );
+  for (const r of rows) if (!out.has(r.item_id)) out.set(r.item_id, r.local_uri);
+  return out;
+}
+
 export async function allAttachments(): Promise<Attachment[]> {
   const db = await getDb();
   return (await db.getAllAsync<AttachmentRow>('SELECT * FROM attachments')).map(toAttachment);

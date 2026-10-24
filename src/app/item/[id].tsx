@@ -7,7 +7,7 @@ import { Alert, Linking, Pressable, StyleSheet, View } from 'react-native';
 
 import { ExtractedFieldRow } from '@/components/items/ExtractedFieldRow';
 import { ReminderSheet } from '@/components/items/ReminderSheet';
-import { AppText, Card, DangerButton, Divider, EmptyState, GhostButton, IconButton, InlineMessage, PrimaryButton, Row, ScreenScroll, SecondaryButton, SectionHeader, StatusBadge, TagList, radius, spacing, useColors } from '@/design-system';
+import { AppText, Card, CategoryIcon, DangerButton, Divider, EmptyState, GhostButton, IconButton, InlineMessage, PrimaryButton, Row, ScreenScroll, SecondaryButton, SectionHeader, StatusBadge, TagList, radius, spacing, useColors } from '@/design-system';
 import { CATEGORY_INFO } from '@/domain/categories';
 import { toUserMessage } from '@/domain/errors';
 import { isOpenableUrl, isPrivateHost } from '@/features/extraction/url-utils';
@@ -96,8 +96,19 @@ export default function ItemScreen() {
       <ScreenScroll>
         {message ? <InlineMessage tone={message.tone} message={message.text} /> : null}
 
+        {item.attachments.find((a) => a.mimeType.startsWith('image/')) ? (
+          <Image
+            source={{ uri: item.attachments.find((a) => a.mimeType.startsWith('image/'))!.localUri }}
+            style={styles.hero}
+            contentFit="cover"
+            accessibilityLabel="첨부 이미지"
+            accessibilityIgnoresInvertColors
+          />
+        ) : null}
+
         <View style={{ gap: spacing.xs }}>
           <Row wrap gap={spacing.xs}>
+            <CategoryIcon category={item.category} size={28} />
             <StatusBadge label={cat.label} tone="accent" />
             {item.status !== 'active' ? <StatusBadge label={STATUS_LABEL[item.status]} /> : null}
             {item.needsReview ? <StatusBadge label="검토 필요" icon="alert-circle-outline" tone="warning" /> : null}
@@ -205,6 +216,7 @@ export default function ItemScreen() {
 }
 
 const styles = StyleSheet.create({
+  hero: { width: '100%', height: 200, borderRadius: radius.card },
   link: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs, borderWidth: 1, borderRadius: radius.button, padding: spacing.sm, minHeight: 44 },
   expandHead: { flexDirection: 'row', alignItems: 'center', minHeight: 44 },
   textBox: { borderRadius: radius.button, padding: spacing.sm },

@@ -1,11 +1,14 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import * as Clipboard from 'expo-clipboard';
+import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { AppText, BottomBar, Card, GhostButton, IconButton, InlineMessage, PrimaryButton, Row, ScreenScroll, SecondaryButton, SectionHeader, TextField, radius, spacing, useColors } from '@/design-system';
+import { AppText, BottomBar, Card, CategoryIcon, GhostButton, IconButton, InlineMessage, PrimaryButton, Row, ScreenScroll, SecondaryButton, SectionHeader, StatusBadge, TextField, elevation, radius, spacing, useColors } from '@/design-system';
+import { CATEGORY_INFO } from '@/domain/categories';
 import { messageFor, toUserMessage } from '@/domain/errors';
+import { categoryHint, classify } from '@/features/extraction/category-classifier';
 import { pickDocuments, pickImages } from '@/features/capture/attachment-import-service';
 import { createDraft, OCR_SUMMARY_TEXT } from '@/features/capture/capture-service';
 import { domainOf, extractUrls } from '@/features/extraction/url-utils';
@@ -15,20 +18,25 @@ import type { CaptureInput } from '@/features/incoming-share/types';
 import { useSharedPayloads } from '@/features/incoming-share/use-shared-payloads';
 import { useAppState } from '@/hooks/app-state';
 
+/** Preview card for one received input. Text is rendered as plain text only (never HTML). */
 function InputPreview({ input, onRemove }: { input: CaptureInput; onRemove: () => void }) {
   const c = useColors();
+  const isImage = input.kind === 'file' && input.mimeType.startsWith('image/');
   const icon = input.kind === 'url' ? 'link-outline' : input.kind === 'text' ? 'document-text-outline' : input.mimeType === 'application/pdf' ? 'document-outline' : 'image-outline';
-  const title = input.kind === 'url' ? (domainOf(input.url) ?? input.url) : input.kind === 'text' ? input.text : (input.name ?? (input.mimeType === 'application/pdf' ? 'PDF 문서' : '이미지'));
-  const sub = input.kind === 'url' ? (input.text ? '링크와 함께 보낸 글' : '링크') : input.kind === 'text' ? '텍스트' : input.mimeType;
+  const head = input.kind === 'url' ? input.url : input.kind === 'text' ? '텍스트' : (input.name ?? (isImage ? '이미지' : 'PDF 문서'));
+  const body = input.kind === 'url' ? input.text : input.kind === 'text' ? input.text : null;
   return (
-    <View style={[styles.preview, { borderColor: c.border, backgroundColor: c.surface }]}>
-      <Ionicons name={icon} size={22} color={c.textSecondary} />
-      <View style={{ flex: 1 }}>
-        {/* Rendered as plain text only — shared content is never interpreted as HTML. */}
-        <AppText variant="body" numberOfLines={2}>{title}</AppText>
-        <AppText variant="caption" tone="tertiary">{sub}</AppText>
+    <View style={[styles.preview, elevation.card, { borderColor: c.border, backgroundColor: c.surface }]}>
+      <View style={styles.previewHead}>
+        <Ionicons name={icon} size={18} color={c.textSecondary} />
+        <AppText variant="meta" tone="secondary" numberOfLines={1} style={{ flex: 1 }}>{head}</AppText>
+        <IconButton icon="close" label="이 항목 빼기" onPress={onRemove} size={18} />
       </View>
-      <IconButton icon="close" label="이 항목 빼기" onPress={onRemove} size={20} />
+      {body ? <AppText variant="bodyStrong" numberOfLines={4}>{body}</AppText> : null}
+      {isImage && input.kind === 'file' ? (
+        <Image source={{ uri: input.uri }} style={styles.previewImage} contentFit="cover" accessibilityLabel="공유받은 이미지" accessibilityIgnoresInvertColors />
+      ) : null}
+      {input.kind === 'url' && !body ? <AppText variant="caption" tone="tertiary">{domainOf(input.url)} · 링크만 저장하고 페이지를 불러오지 않아요</AppText> : null}
     </View>
   );
 }
@@ -38,6 +46,7 @@ function InputPreview({ input, onRemove }: { input: CaptureInput; onRemove: () =
  * Creates a draft and moves to the review screen. Nothing is fetched from the network.
  */
 export default function CaptureScreen() {
+  const c = useColors();
   const router = useRouter();
   const params = useLocalSearchParams<{ source?: string }>();
   const { settings, notifyDataChanged } = useAppState();
@@ -74,6 +83,10 @@ export default function CaptureScreen() {
     return urls.length ? [{ kind: 'url', url: urls[0], text: t === urls[0] ? null : t, sourceType: 'manual' }] : [{ kind: 'text', text: t, sourceType: 'manual' }];
   };
   const all = [...inputs, ...typedInputs()];
+  // Instant, real preview of the category rule (same classifier the draft will use; text inputs only).
+  const previewText = all.map((i) => (i.kind === 'text' ? i.text : i.kind === 'url' ? `${i.text ?? ''} ${i.url}` : '')).join('\n');
+  const previewDomain = all.find((i) => i.kind === 'url') as Extract<CaptureInput, { kind: 'url' }> | undefined;
+  const candidates = previewText.trim() ? classify({ text: previewText, domain: previewDomain ? domainOf(previewDomain.url) : null }).filter((x) => x.score > 0).slice(0, 3) : [];
 
   const addFiles = async (picker: () => Promise<CaptureInput[]>) => {
     try {
@@ -116,7 +129,7 @@ export default function CaptureScreen() {
         {notice ? <InlineMessage tone={notice.tone} message={notice.text} /> : null}
 
         {inputs.length ? (
-          <View style={{ gap: spacing.xs }}>
+          <View style={{ gap: spacing.sm }}>
             <SectionHeader title="받은 내용" subtitle={`${inputs.length}개 · 기기 안에서만 처리해요`} />
             {inputs.map((input, i) => (
               <InputPreview key={`${input.kind}-${i}`} input={input} onRemove={() => setInputs((cur) => cur.filter((_, j) => j !== i))} />
@@ -124,9 +137,24 @@ export default function CaptureScreen() {
           </View>
         ) : null}
 
+        {candidates.length ? (
+          <View style={{ gap: spacing.xs }}>
+            <AppText variant="label">자동 분류 미리보기</AppText>
+            <Row wrap gap={spacing.xs}>
+              {candidates.map((cand) => (
+                <View key={cand.category} style={[styles.candidate, { backgroundColor: c.surface, borderColor: c.border }]}>
+                  <CategoryIcon category={cand.category} size={24} />
+                  <AppText variant="label">{CATEGORY_INFO[cand.category].short}</AppText>
+                </View>
+              ))}
+            </Row>
+            <StatusBadge label={categoryHint(candidates[0])} icon="sparkles-outline" tone="accent" />
+          </View>
+        ) : null}
+
         <View style={{ gap: spacing.xs }}>
           <TextField
-            label="링크나 텍스트"
+            label={inputs.length ? '메모나 텍스트 더하기' : '링크나 텍스트'}
             value={text}
             onChangeText={setText}
             multiline
@@ -160,5 +188,8 @@ export default function CaptureScreen() {
 }
 
 const styles = StyleSheet.create({
-  preview: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, borderWidth: 1, borderRadius: radius.tile, paddingLeft: spacing.sm, paddingVertical: spacing.xxs },
+  preview: { gap: spacing.xs, borderWidth: 1, borderRadius: radius.card, padding: spacing.sm },
+  previewHead: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
+  previewImage: { width: '100%', height: 180, borderRadius: radius.tile },
+  candidate: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs, borderWidth: 1, borderRadius: radius.chip, paddingVertical: 6, paddingHorizontal: spacing.sm },
 });

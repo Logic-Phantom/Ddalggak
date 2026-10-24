@@ -6,6 +6,7 @@ export * from './components/AppSwitch';
 export * from './components/Badges';
 export * from './components/Brand';
 export * from './components/Buttons';
+export * from './components/CategoryIcon';
 export * from './components/Checkbox';
 export * from './components/Feedback';
 export * from './components/FilterChip';

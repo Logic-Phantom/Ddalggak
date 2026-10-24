@@ -1,7 +1,7 @@
 /**
- * 딸깍 design tokens — "Calm Personal Inbox".
- * Quiet neutral background, white cards, one restrained blue accent for actions and selection.
- * Status (review needed / due soon / done) always pairs color with an icon and text.
+ * 딸깍 design tokens — "Calm Personal Inbox", deep-green edition (2026-10-24 redesign).
+ * Near-white mint background, white rounded cards, deep green for primary actions,
+ * pastel circles per category. Status always pairs color with an icon and text.
  * Rules: docs/DESIGN_SYSTEM.md. Screens must not define their own colors/spacings.
  */
 
@@ -33,22 +33,22 @@ export interface ColorTokens {
 }
 
 export const lightColors: ColorTokens = {
-  background: '#F6F7F9',
+  background: '#F5F8F7',
   surface: '#FFFFFF',
   surfaceElevated: '#FFFFFF',
-  surfaceSunken: '#EEF0F3',
-  textPrimary: '#191B20',
-  textSecondary: '#555B66',
-  textTertiary: '#7C818B',
+  surfaceSunken: '#EDF2F0',
+  textPrimary: '#16201D',
+  textSecondary: '#55605C',
+  textTertiary: '#7E8884',
   textOnAccent: '#FFFFFF',
-  border: '#E4E6EB',
-  borderStrong: '#CDD1D8',
-  // White text on accent ≈ 6:1.
-  accent: '#2F5BD3',
-  accentPressed: '#244AB3',
-  accentSoft: '#EAF0FD',
-  accentText: '#2449B0',
-  selected: '#2F5BD3',
+  border: '#E2E8E5',
+  borderStrong: '#CBD4D0',
+  // Deep green: white text on it ≈ 11:1.
+  accent: '#1F3D36',
+  accentPressed: '#152C27',
+  accentSoft: '#E4F1EB',
+  accentText: '#1E6B4E',
+  selected: '#1F3D36',
   selectedText: '#FFFFFF',
   success: '#1E7A4C',
   successSoft: '#E4F3EA',
@@ -60,22 +60,22 @@ export const lightColors: ColorTokens = {
 };
 
 export const darkColors: ColorTokens = {
-  background: '#101114',
-  surface: '#1A1C20',
-  surfaceElevated: '#23262B',
-  surfaceSunken: '#0A0B0D',
-  textPrimary: '#F2F3F5',
-  textSecondary: '#AEB3BC',
-  textTertiary: '#868B94',
-  textOnAccent: '#0B1530',
-  border: '#2A2D33',
-  borderStrong: '#3C4048',
-  accent: '#8FA8FF',
-  accentPressed: '#7A95F2',
-  accentSoft: '#1C2540',
-  accentText: '#A9BDFF',
-  selected: '#8FA8FF',
-  selectedText: '#0B1530',
+  background: '#0E1311',
+  surface: '#18201D',
+  surfaceElevated: '#202A26',
+  surfaceSunken: '#090D0B',
+  textPrimary: '#EEF3F1',
+  textSecondary: '#A9B5B0',
+  textTertiary: '#83908B',
+  textOnAccent: '#0B1A15',
+  border: '#28322E',
+  borderStrong: '#3A4641',
+  accent: '#8FD3B4',
+  accentPressed: '#7AC3A3',
+  accentSoft: '#183028',
+  accentText: '#9FDCC0',
+  selected: '#8FD3B4',
+  selectedText: '#0B1A15',
   success: '#5CC58F',
   successSoft: '#13291C',
   warning: '#E8B54A',
@@ -83,6 +83,33 @@ export const darkColors: ColorTokens = {
   error: '#FF8A80',
   errorSoft: '#3A1715',
   scrim: 'rgba(0,0,0,0.65)',
+};
+
+/** Pastel circle tones for category icons (bg = circle, fg = icon). Icon + label, never color alone. */
+export type CategoryToneName = 'green' | 'orange' | 'blue' | 'purple' | 'pink' | 'teal' | 'yellow' | 'gray' | 'indigo';
+export const categoryTones: Record<'light' | 'dark', Record<CategoryToneName, { bg: string; fg: string }>> = {
+  light: {
+    green: { bg: '#E3F4EA', fg: '#1F8A55' },
+    orange: { bg: '#FDEEE2', fg: '#C2581C' },
+    blue: { bg: '#E4EEFB', fg: '#2B63B8' },
+    purple: { bg: '#EFE8FB', fg: '#6B47B8' },
+    pink: { bg: '#FBE7EE', fg: '#B83A67' },
+    teal: { bg: '#E1F3F3', fg: '#1E7F7F' },
+    yellow: { bg: '#FBF3DC', fg: '#8F6500' },
+    gray: { bg: '#ECEFEE', fg: '#55605C' },
+    indigo: { bg: '#E8EAFB', fg: '#4048B0' },
+  },
+  dark: {
+    green: { bg: '#163225', fg: '#7FD3A6' },
+    orange: { bg: '#3A2416', fg: '#F2A877' },
+    blue: { bg: '#172A42', fg: '#8DB6F2' },
+    purple: { bg: '#2A2140', fg: '#BBA2F2' },
+    pink: { bg: '#3A1A27', fg: '#F29BBB' },
+    teal: { bg: '#143232', fg: '#7FD3D3' },
+    yellow: { bg: '#352B10', fg: '#E8C55A' },
+    gray: { bg: '#232B28', fg: '#A9B5B0' },
+    indigo: { bg: '#1E2142', fg: '#A3A9F2' },
+  },
 };
 
 export const spacing = {
@@ -100,9 +127,9 @@ export const radius = {
   tile: 14,
   chip: 999,
   /** Text fields, inline messages, buttons. */
-  button: 12,
-  card: 16,
-  sheet: 22,
+  button: 14,
+  card: 18,
+  sheet: 24,
 } as const;
 
 export const elevation = {

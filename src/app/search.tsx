@@ -19,12 +19,12 @@ export default function SearchScreen() {
   const { data, loading } = useLoader(() => searchItems(terms, { statuses }), [terms.join(' '), includeArchived]);
 
   return (
-    <ScreenScroll topInset>
-      <AppText variant="screenTitle">검색</AppText>
+    <ScreenScroll>
       <TextField
         label="검색어"
         value={query}
         onChangeText={setQuery}
+        autoFocus
         placeholder="상호, 메모, 링크, 태그, 이미지에서 읽은 글자"
         returnKeyType="search"
         autoCapitalize="none"

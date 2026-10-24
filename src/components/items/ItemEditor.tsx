@@ -1,8 +1,29 @@
+import { Image } from 'expo-image';
 import { useState } from 'react';
-import { Alert, View } from 'react-native';
+import { Alert, StyleSheet, View } from 'react-native';
 
-import { AppText, BottomBar, Card, FilterChip, GhostButton, InlineMessage, PrimaryButton, Row, ScreenScroll, SecondaryButton, SectionHeader, TextField, spacing } from '@/design-system';
-import { CATEGORY_INFO } from '@/domain/categories';
+import {
+  AppText,
+  BottomBar,
+  Card,
+  CategoryIcon,
+  FilterChip,
+  GhostButton,
+  InlineMessage,
+  PrimaryButton,
+  Row,
+  ScreenScroll,
+  SecondaryButton,
+  SectionHeader,
+  TextField,
+  elevation,
+  radius,
+  spacing,
+  useCategoryTone,
+  useColors,
+  type IconName,
+} from '@/design-system';
+import { CATEGORY_INFO, fieldLabel } from '@/domain/categories';
 import { toUserMessage } from '@/domain/errors';
 import { CATEGORIES, type Category, type ExtractedField, type FieldType, type ItemDetail } from '@/domain/models';
 import { categoryHint, classify } from '@/features/extraction/category-classifier';
@@ -21,6 +42,35 @@ const MANUAL_TYPES: { type: FieldType; label: string; placeholder: string }[] = 
   { type: 'address', label: '주소', placeholder: '서울 마포구 양화로 12' },
   { type: 'coupon-code', label: '쿠폰 코드', placeholder: 'ABCD-1234' },
 ];
+
+/** Top summary (thumbnail or category icon, live title, category, most relevant date). */
+function SummaryCard({ item, title, category }: { item: ItemDetail; title: string; category: Category }) {
+  const c = useColors();
+  const tone = useCategoryTone(category);
+  const image = item.attachments.find((a) => a.mimeType.startsWith('image/'));
+  const date = item.fields.find((f) => f.fieldType === 'date' && f.normalizedValue);
+  return (
+    <View style={[styles.summary, elevation.card, { backgroundColor: c.surface, borderColor: c.border }]}>
+      {image ? (
+        <Image source={{ uri: image.localUri }} style={styles.summaryThumb} contentFit="cover" accessible={false} />
+      ) : (
+        <View style={[styles.summaryThumb, { backgroundColor: tone.bg, alignItems: 'center', justifyContent: 'center' }]}>
+          <CategoryIcon category={category} size={48} />
+        </View>
+      )}
+      <View style={{ flex: 1, gap: 2 }}>
+        <AppText variant="caption" style={{ color: tone.fg }}>{CATEGORY_INFO[category].label}</AppText>
+        <AppText variant="bodyStrong" numberOfLines={2}>{title || '제목 없음'}</AppText>
+        {date ? <AppText variant="meta" tone="tertiary">{fieldLabel('date', date.role)} {date.valueText}{date.userConfirmed ? '' : ' · 확인 전'}</AppText> : null}
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  summary: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, padding: spacing.sm, borderWidth: 1, borderRadius: radius.card },
+  summaryThumb: { width: 72, height: 72, borderRadius: radius.tile },
+});
 
 export interface ItemEditorProps {
   item: ItemDetail;
@@ -127,6 +177,7 @@ export function ItemEditor({ item, mode, reload, onSaved, onCancel, notices }: I
     <View style={{ flex: 1 }}>
       <ScreenScroll withBottomBar="summary">
         {notices}
+        <SummaryCard item={item} title={title} category={category} />
         {error ? <InlineMessage tone="error" message={error} /> : null}
 
         <View style={{ gap: spacing.sm }}>
@@ -138,7 +189,7 @@ export function ItemEditor({ item, mode, reload, onSaved, onCancel, notices }: I
             ) : null}
             <Row wrap gap={spacing.xs}>
               {CATEGORIES.map((id) => (
-                <FilterChip key={id} role="radio" label={CATEGORY_INFO[id].label} selected={category === id} onPress={() => setCategory(id)} />
+                <FilterChip key={id} role="radio" icon={CATEGORY_INFO[id].icon as IconName} label={CATEGORY_INFO[id].short} selected={category === id} onPress={() => setCategory(id)} />
               ))}
             </Row>
           </View>
@@ -198,7 +249,7 @@ export function ItemEditor({ item, mode, reload, onSaved, onCancel, notices }: I
           </AppText>
         }>
         <SecondaryButton label={mode === 'review' ? '버리기' : '취소'} onPress={onCancel} style={{ flex: 1 }} />
-        <PrimaryButton label={mode === 'review' ? '저장' : '수정 완료'} onPress={save} loading={saving} style={{ flex: 2 }} testID="save-item" />
+        <PrimaryButton label={mode === 'review' ? '저장하기' : '수정 완료'} onPress={save} loading={saving} style={{ flex: 2 }} testID="save-item" />
       </BottomBar>
     </View>
   );

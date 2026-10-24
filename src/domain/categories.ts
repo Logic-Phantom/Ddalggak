@@ -3,23 +3,30 @@ import type { Category, DateRole, FieldType, MoneyRole } from './models';
 export interface CategoryInfo {
   id: Category;
   label: string;
+  /** Short label for chips and icon grids. */
+  short: string;
   /** Ionicons name. */
   icon: string;
+  /** Pastel tone name from design-system `categoryTones`. */
+  tone: 'green' | 'orange' | 'blue' | 'purple' | 'pink' | 'teal' | 'yellow' | 'gray' | 'indigo';
 }
 
 export const CATEGORY_INFO: Record<Category, CategoryInfo> = {
-  place: { id: 'place', label: '장소·식당', icon: 'location-outline' },
-  shopping: { id: 'shopping', label: '쇼핑', icon: 'bag-handle-outline' },
-  receipt: { id: 'receipt', label: '영수증', icon: 'receipt-outline' },
-  coupon: { id: 'coupon', label: '쿠폰', icon: 'pricetag-outline' },
-  reservation: { id: 'reservation', label: '예약', icon: 'calendar-outline' },
-  event: { id: 'event', label: '일정·행사', icon: 'megaphone-outline' },
-  ticket: { id: 'ticket', label: '티켓', icon: 'ticket-outline' },
-  warranty: { id: 'warranty', label: '보증서', icon: 'shield-checkmark-outline' },
-  document: { id: 'document', label: '문서', icon: 'document-text-outline' },
-  link: { id: 'link', label: '링크', icon: 'link-outline' },
-  other: { id: 'other', label: '기타', icon: 'ellipsis-horizontal-circle-outline' },
+  place: { id: 'place', label: '장소·식당', short: '장소', icon: 'location', tone: 'green' },
+  shopping: { id: 'shopping', label: '쇼핑', short: '쇼핑', icon: 'bag-handle', tone: 'orange' },
+  receipt: { id: 'receipt', label: '영수증', short: '영수증', icon: 'receipt', tone: 'teal' },
+  coupon: { id: 'coupon', label: '쿠폰', short: '쿠폰', icon: 'pricetag', tone: 'purple' },
+  reservation: { id: 'reservation', label: '예약', short: '예약', icon: 'calendar', tone: 'blue' },
+  event: { id: 'event', label: '일정·행사', short: '일정', icon: 'megaphone', tone: 'pink' },
+  ticket: { id: 'ticket', label: '티켓', short: '티켓', icon: 'ticket', tone: 'indigo' },
+  warranty: { id: 'warranty', label: '보증서', short: '보증서', icon: 'shield-checkmark', tone: 'yellow' },
+  document: { id: 'document', label: '문서', short: '문서', icon: 'document-text', tone: 'gray' },
+  link: { id: 'link', label: '링크', short: '링크', icon: 'link', tone: 'indigo' },
+  other: { id: 'other', label: '기타', short: '기타', icon: 'ellipsis-horizontal', tone: 'gray' },
 };
+
+/** Categories shown in the home icon grid and library tabs (the rest stay reachable via "기타"). */
+export const PRIMARY_CATEGORIES: Category[] = ['place', 'shopping', 'coupon', 'reservation', 'event', 'receipt', 'ticket', 'warranty'];
 
 export const DATE_ROLE_LABEL: Record<DateRole, string> = {
   expiry: '만료일',

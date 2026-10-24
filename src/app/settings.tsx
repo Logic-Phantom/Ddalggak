@@ -1,4 +1,3 @@
-import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Alert, View } from 'react-native';
 
@@ -8,7 +7,6 @@ import { pickJsonFile } from '@/features/capture/attachment-import-service';
 import { exportToShareSheet, importFromFile } from '@/features/export-import/export-service';
 import { clearOcrTextEverywhere, countByStatus } from '@/features/items/item-repository';
 import { deleteAllData } from '@/features/items/item-service';
-import { currentOcrProviderId } from '@/features/ocr/ocr-service';
 import { useAppState } from '@/hooks/app-state';
 import { useLoader } from '@/hooks/use-loader';
 import { appStorageBytes } from '@/infrastructure/file-storage/app-files';
@@ -29,7 +27,6 @@ function ToggleRow({ label, hint, value, onChange }: { label: string; hint: stri
 }
 
 export default function SettingsScreen() {
-  const router = useRouter();
   const { settings, updateSettings, notifyDataChanged } = useAppState();
   const [message, setMessage] = useState<{ tone: 'success' | 'error'; text: string } | null>(null);
   const { data } = useLoader(async () => ({ counts: await countByStatus(), bytes: appStorageBytes() }));
@@ -100,8 +97,7 @@ export default function SettingsScreen() {
     ]);
 
   return (
-    <ScreenScroll topInset>
-      <AppText variant="screenTitle">설정</AppText>
+    <ScreenScroll>
       {message ? <InlineMessage tone={message.tone} message={message.text} /> : null}
 
       <View style={{ gap: spacing.xs }}>
@@ -125,8 +121,6 @@ export default function SettingsScreen() {
       <View style={{ gap: spacing.xs }}>
         <SectionHeader title="데이터" />
         <Card padded={false}>
-          <ListRow icon="archive-outline" label="보관함·완료" value={data ? `${data.counts.archived + data.counts.completed}개` : undefined} onPress={() => router.push('/archive')} />
-          <Divider inset={spacing.md} />
           <ListRow icon="share-outline" label="내보내기 (JSON)" onPress={doExport} role="button" />
           <Divider inset={spacing.md} />
           <ListRow icon="download-outline" label="가져오기" onPress={doImport} role="button" />
@@ -138,15 +132,6 @@ export default function SettingsScreen() {
         </AppText>
       </View>
 
-      <View style={{ gap: spacing.xs }}>
-        <SectionHeader title="정보" />
-        <Card padded={false}>
-          <ListRow icon="shield-checkmark-outline" label="개인정보와 데이터" onPress={() => router.push('/privacy')} />
-        </Card>
-        <AppText variant="caption" tone="tertiary">
-          이미지 글자 인식: {currentOcrProviderId() === 'unavailable' ? '이 버전에서는 아직 지원하지 않아요' : currentOcrProviderId()} · 버전 0.1.0
-        </AppText>
-      </View>
     </ScreenScroll>
   );
 }

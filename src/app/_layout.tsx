@@ -1,5 +1,5 @@
 import { useFonts } from 'expo-font';
-import { DarkTheme, DefaultTheme, Stack, ThemeProvider, useRouter } from 'expo-router';
+import { DarkTheme, DefaultTheme, Stack, ThemeProvider, useRouter, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
@@ -19,13 +19,22 @@ const FONT_FILES = {
   [fonts.bold]: require('@/assets/fonts/Pretendard-Bold.otf'),
 };
 
-/** Hides the splash once the database is open, and routes notification taps to the item. */
+/**
+ * Hides the splash once the database is open, shows onboarding on first run (but never blocks a
+ * share that arrives before onboarding), and routes notification taps to the item.
+ */
 function StartupEffects() {
-  const { ready } = useAppState();
+  const { ready, settings } = useAppState();
   const router = useRouter();
+  const segments = useSegments();
   useEffect(() => {
     if (ready) SplashScreen.hideAsync().catch(() => {});
   }, [ready]);
+  useEffect(() => {
+    if (!ready || settings.onboardingSeenAt) return;
+    const first = segments[0] as string | undefined;
+    if (first !== 'onboarding' && first !== 'capture') router.replace('/onboarding');
+  }, [ready, settings.onboardingSeenAt, segments, router]);
   useEffect(() => onNotificationOpened((itemId) => router.push({ pathname: '/item/[id]', params: { id: itemId } })), [router]);
   return null;
 }
@@ -53,13 +62,14 @@ export default function RootLayout() {
               headerShadowVisible: false,
               contentStyle: { backgroundColor: c.background },
             }}>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false, title: '인박스' }} />
-            <Stack.Screen name="capture/index" options={{ title: '추가하기' }} />
-            <Stack.Screen name="capture/review" options={{ title: '내용 확인', gestureEnabled: false }} />
-            <Stack.Screen name="item/[id]" options={{ title: '상세' }} />
-            <Stack.Screen name="item/edit/[id]" options={{ title: '수정' }} />
-            <Stack.Screen name="category/[category]" options={{ title: '분류' }} />
-            <Stack.Screen name="archive" options={{ title: '보관함·완료' }} />
+            <Stack.Screen name="(tabs)" options={{ headerShown: false, title: '홈' }} />
+            <Stack.Screen name="onboarding" options={{ headerShown: false, gestureEnabled: false }} />
+            <Stack.Screen name="capture/index" options={{ title: '공유받은 정보' }} />
+            <Stack.Screen name="capture/review" options={{ title: '정보 확인하기', gestureEnabled: false }} />
+            <Stack.Screen name="item/[id]" options={{ title: '상세보기' }} />
+            <Stack.Screen name="item/edit/[id]" options={{ title: '수정하기' }} />
+            <Stack.Screen name="search" options={{ title: '검색' }} />
+            <Stack.Screen name="settings" options={{ title: '저장·데이터 설정' }} />
             <Stack.Screen name="privacy" options={{ title: '개인정보와 데이터' }} />
           </Stack>
         </AppStateProvider>
