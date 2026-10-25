@@ -64,12 +64,12 @@ export default function RootLayout() {
             }}>
             <Stack.Screen name="(tabs)" options={{ headerShown: false, title: '홈' }} />
             <Stack.Screen name="onboarding" options={{ headerShown: false, gestureEnabled: false }} />
-            <Stack.Screen name="capture/index" options={{ title: '공유받은 정보' }} />
-            <Stack.Screen name="capture/review" options={{ title: '정보 확인하기', gestureEnabled: false }} />
-            <Stack.Screen name="item/[id]" options={{ title: '상세보기' }} />
-            <Stack.Screen name="item/edit/[id]" options={{ title: '수정하기' }} />
+            <Stack.Screen name="capture/index" options={{ title: '받은 정보' }} />
+            <Stack.Screen name="capture/review" options={{ title: '저장 전 확인', gestureEnabled: false }} />
+            <Stack.Screen name="item/[id]" options={{ title: '상세' }} />
+            <Stack.Screen name="item/edit/[id]" options={{ title: '수정' }} />
             <Stack.Screen name="search" options={{ title: '검색' }} />
-            <Stack.Screen name="settings" options={{ title: '저장·데이터 설정' }} />
+            <Stack.Screen name="settings" options={{ title: '설정' }} />
             <Stack.Screen name="privacy" options={{ title: '개인정보와 데이터' }} />
           </Stack>
         </AppStateProvider>

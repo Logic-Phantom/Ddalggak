@@ -27,7 +27,7 @@ export default function MeScreen() {
     const [counts, soon] = await Promise.all([countByStatus(), confirmedDatesBetween(today, addDays(today, 8))]);
     return { counts, soon: new Set(soon.map((s) => s.item.id)).size };
   });
-  const saved = data ? data.counts.active + data.counts.completed + data.counts.archived : '-';
+  const saved = data ? data.counts.pending + data.counts.active + data.counts.completed + data.counts.archived : '-';
 
   return (
     <ScreenScroll topInset>
@@ -37,7 +37,7 @@ export default function MeScreen() {
         </View>
         <View style={{ flex: 1 }}>
           <AppText variant="sectionTitle">내 딸깍</AppText>
-          <AppText variant="caption" tone="tertiary">로그인 없이 이 기기에만 저장 중이에요</AppText>
+          <AppText variant="caption" tone="tertiary">로그인 없이 이 기기에만 저장돼요</AppText>
         </View>
         <BrandMark size={30} />
       </View>
@@ -55,7 +55,7 @@ export default function MeScreen() {
         <Divider inset={spacing.md} />
         <ListRow icon="folder-open-outline" label="완료·보관한 항목" value={data ? `${data.counts.completed + data.counts.archived}개` : undefined} onPress={() => router.push('/library')} />
         <Divider inset={spacing.md} />
-        <ListRow icon="settings-outline" label="저장·데이터 설정" onPress={() => router.push('/settings')} />
+        <ListRow icon="settings-outline" label="설정" onPress={() => router.push('/settings')} />
         <Divider inset={spacing.md} />
         <ListRow icon="shield-checkmark-outline" label="개인정보와 데이터" onPress={() => router.push('/privacy')} />
       </Card>
@@ -64,13 +64,13 @@ export default function MeScreen() {
         <View style={{ gap: spacing.xxs }}>
           <AppText variant="label">도움말</AppText>
           <AppText variant="secondary" tone="secondary">
-            다른 앱에서 공유 버튼 → ‘딸깍’을 고르세요. 처음에는 목록 끝의 ‘더보기’ 안에 있을 수 있어요.
+            다른 앱에서 공유 → ‘딸깍’. 처음엔 ‘더보기’ 안에 있을 수 있어요.
           </AppText>
         </View>
       </Card>
 
       <AppText variant="caption" tone="tertiary" align="center">
-        딸깍 0.1.0 · 이미지 글자 인식 {currentOcrProviderId() === 'unavailable' ? '준비 중' : currentOcrProviderId()}
+        딸깍 0.1.0 · 글자 인식 {currentOcrProviderId() === 'unavailable' ? '이 기기에서 지원 안 함' : '사용 가능'}
       </AppText>
     </ScreenScroll>
   );

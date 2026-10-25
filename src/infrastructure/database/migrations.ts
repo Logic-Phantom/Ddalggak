@@ -83,4 +83,12 @@ export const MIGRATIONS: string[] = [
     PRIMARY KEY (item_id, tag_id)
   );
   `,
+  // v2 — reminders remember the confirmed date they were made from, so editing/unconfirming that
+  // date can reschedule or switch off the OS notification. Existing rows keep NULL (unlinked).
+  `
+  ALTER TABLE reminders ADD COLUMN source_field_id TEXT;
+  ALTER TABLE reminders ADD COLUMN target_date TEXT;
+  ALTER TABLE reminders ADD COLUMN days_before INTEGER;
+  CREATE INDEX IF NOT EXISTS idx_reminders_field ON reminders(source_field_id);
+  `,
 ];

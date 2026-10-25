@@ -2,7 +2,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import * as Clipboard from 'expo-clipboard';
 import { Image } from 'expo-image';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { AppText, BottomBar, Card, CategoryIcon, GhostButton, IconButton, InlineMessage, PrimaryButton, Row, ScreenScroll, SecondaryButton, SectionHeader, StatusBadge, TextField, elevation, radius, spacing, useColors } from '@/design-system';
@@ -10,7 +10,7 @@ import { CATEGORY_INFO } from '@/domain/categories';
 import { messageFor, toUserMessage } from '@/domain/errors';
 import { categoryHint, classify } from '@/features/extraction/category-classifier';
 import { pickDocuments, pickImages } from '@/features/capture/attachment-import-service';
-import { createDraft, OCR_SUMMARY_TEXT } from '@/features/capture/capture-service';
+import { captureItem, type CaptureMode } from '@/features/capture/capture-service';
 import { domainOf, extractUrls } from '@/features/extraction/url-utils';
 import { MAX_ITEMS_PER_SHARE, MAX_TEXT_LENGTH } from '@/features/incoming-share/mime-validation';
 import { normalizeSharePayloads } from '@/features/incoming-share/share-payload-normalizer';
@@ -54,7 +54,7 @@ export default function CaptureScreen() {
   const normalized = useMemo(() => normalizeSharePayloads(share.payloads), [share.payloads]);
   const [inputs, setInputs] = useState<CaptureInput[]>([]);
   const [text, setText] = useState('');
-  const [busy, setBusy] = useState(false);
+  const [busy, setBusy] = useState<CaptureMode | null>(null);
   const [notice, setNotice] = useState<{ tone: 'warning' | 'error' | 'info'; text: string } | null>(null);
 
   // Adopt each new shared payload once (state derived during render, React's "previous value" pattern).
@@ -73,7 +73,7 @@ export default function CaptureScreen() {
   const shareNotice = adopted?.rejected
     ? { tone: 'warning' as const, text: `${adopted.rejected}개는 가져오지 못했어요. ${adopted.reason ?? ''}` }
     : params.source === 'share' && !adopted
-      ? { tone: 'info' as const, text: '공유된 내용을 찾지 못했어요. 아래에서 링크·텍스트를 붙여 넣거나 파일을 선택해 주세요.' }
+      ? { tone: 'info' as const, text: '공유된 내용을 찾지 못했어요. 아래에 직접 붙여 넣거나 파일을 골라 주세요.' }
       : null;
 
   const typedInputs = (): CaptureInput[] => {
@@ -104,34 +104,41 @@ export default function CaptureScreen() {
     else setNotice({ tone: 'info', text: '클립보드가 비어 있어요.' });
   };
 
-  const analyze = async () => {
-    if (!all.length) return setNotice({ tone: 'info', text: '링크·텍스트를 입력하거나 파일을 추가해 주세요.' });
-    setBusy(true);
+  // A ref, not only state: two taps in the same frame both see `busy === false`.
+  const running = useRef(false);
+  const save = async (mode: CaptureMode) => {
+    if (running.current) return;
+    if (!all.length) return setNotice({ tone: 'info', text: '저장할 링크·텍스트나 파일을 넣어 주세요.' });
+    running.current = true;
+    setBusy(mode);
     setNotice(null);
     try {
-      const outcome = await createDraft(all, settings);
+      const outcome = await captureItem(all, settings, mode);
       notifyDataChanged();
-      router.replace({
-        pathname: '/capture/review',
-        params: { id: outcome.itemId, ocr: OCR_SUMMARY_TEXT[outcome.ocr] ?? '', skipped: outcome.skipped.length ? `${outcome.skipped.length}개 파일은 가져오지 못했어요. ${messageFor(outcome.skipped[0])}` : '' },
-      });
+      const skipped = outcome.skipped.length ? `${outcome.skipped.length}개 파일은 가져오지 못했어요. ${messageFor(outcome.skipped[0])}` : '';
+      if (mode === 'quick') {
+        router.replace({ pathname: '/item/[id]', params: { id: outcome.itemId, quick: '1', skipped } });
+      } else {
+        router.replace({ pathname: '/capture/review', params: { id: outcome.itemId, ocr: outcome.ocr, ocrReason: outcome.ocrReason ?? '', skipped } });
+      }
     } catch (e) {
       setNotice({ tone: 'error', text: toUserMessage(e) });
     } finally {
-      setBusy(false);
+      running.current = false;
+      setBusy(null);
     }
   };
 
   return (
     <View style={{ flex: 1 }}>
-      <Stack.Screen options={{ title: adopted || params.source === 'share' ? '공유받은 정보' : '새 정보 추가' }} />
+      <Stack.Screen options={{ title: adopted || params.source === 'share' ? '받은 정보' : '새로 저장' }} />
       <ScreenScroll withBottomBar>
         {shareNotice ? <InlineMessage tone={shareNotice.tone} message={shareNotice.text} /> : null}
         {notice ? <InlineMessage tone={notice.tone} message={notice.text} /> : null}
 
         {inputs.length ? (
           <View style={{ gap: spacing.sm }}>
-            <SectionHeader title="받은 내용" subtitle={`${inputs.length}개 · 기기 안에서만 처리해요`} />
+            <SectionHeader title="받은 내용" subtitle={`${inputs.length}개`} />
             {inputs.map((input, i) => (
               <InputPreview key={`${input.kind}-${i}`} input={input} onRemove={() => setInputs((cur) => cur.filter((_, j) => j !== i))} />
             ))}
@@ -140,7 +147,7 @@ export default function CaptureScreen() {
 
         {candidates.length ? (
           <View style={{ gap: spacing.xs }}>
-            <AppText variant="label">자동 분류 미리보기</AppText>
+            <AppText variant="label">이런 정보 같아요</AppText>
             <Row wrap gap={spacing.xs}>
               {candidates.map((cand) => (
                 <View key={cand.category} style={[styles.candidate, { backgroundColor: c.surface, borderColor: c.border }]}>
@@ -155,34 +162,43 @@ export default function CaptureScreen() {
 
         <View style={{ gap: spacing.xs }}>
           <TextField
-            label={inputs.length ? '메모나 텍스트 더하기' : '링크나 텍스트'}
+            label={inputs.length ? '메모 추가' : '링크나 텍스트'}
             value={text}
             onChangeText={setText}
             multiline
-            placeholder="예) https://map.naver.com/... 또는 '11월 2일 저녁 7시 예약, 예약번호 R1234'"
+            placeholder="링크나 메모를 붙여 넣어 주세요"
             autoCapitalize="none"
             testID="capture-text"
           />
           <Row gap={spacing.xs} wrap>
             <GhostButton compact icon="clipboard-outline" label="붙여넣기" onPress={paste} />
-            <GhostButton compact icon="image-outline" label="사진 선택" onPress={() => addFiles(pickImages)} />
-            <GhostButton compact icon="document-outline" label="파일 선택 (PDF·이미지)" onPress={() => addFiles(pickDocuments)} />
+            <GhostButton compact icon="image-outline" label="사진" onPress={() => addFiles(pickImages)} accessibilityHint="사진을 골라 추가해요" />
+            <GhostButton compact icon="document-outline" label="파일" onPress={() => addFiles(pickDocuments)} accessibilityHint="PDF나 이미지 파일을 골라 추가해요" />
           </Row>
         </View>
 
         <Card>
           <View style={{ gap: spacing.xxs }}>
             <AppText variant="label">다른 앱에서 바로 보내기</AppText>
-            <AppText variant="secondary" tone="secondary">카카오톡·브라우저·사진 앱에서 공유 버튼을 누르고 ‘딸깍’을 고르면 이 화면으로 와요. 앱마다 보내 주는 형식이 달라서 일부는 링크나 텍스트만 전달될 수 있어요.</AppText>
+            <AppText variant="secondary" tone="secondary">카카오톡·브라우저·갤러리에서 공유 → ‘딸깍’을 누르면 바로 여기로 와요.</AppText>
           </View>
         </Card>
         <AppText variant="caption" tone="tertiary">
-          {settings.retainAttachments ? '이미지·PDF 원본은 앱 안에 복사해 보관해요. 설정에서 끌 수 있어요.' : '첨부 보관이 꺼져 있어 이미지·PDF 원본은 저장하지 않아요.'}
+          {settings.retainAttachments ? '이미지·PDF 원본도 앱 안에 함께 저장돼요.' : '첨부 보관이 꺼져 있어 원본 이미지·PDF는 남기지 않아요.'}
         </AppText>
       </ScreenScroll>
-      <BottomBar>
-        <SecondaryButton label="취소" onPress={() => router.back()} style={{ flex: 1 }} />
-        <PrimaryButton label="정리하기" icon="sparkles-outline" onPress={analyze} loading={busy} disabled={!all.length} style={{ flex: 2 }} testID="analyze" />
+      <BottomBar summary={all.length ? <AppText variant="caption" tone="tertiary">바쁘면 임시 저장 — 확인은 나중에 이어서 할 수 있어요.</AppText> : undefined}>
+        <SecondaryButton
+          label="임시 저장"
+          icon="time-outline"
+          onPress={() => save('quick')}
+          loading={busy === 'quick'}
+          disabled={!all.length || busy === 'review'}
+          accessibilityHint="확인은 나중에 하고 원본만 먼저 저장해요. 알림은 만들지 않아요."
+          style={{ flex: 1 }}
+          testID="quick-save"
+        />
+        <PrimaryButton label="저장하기" icon="checkmark" accessibilityHint="찾은 날짜·금액을 확인한 뒤 저장해요." onPress={() => save('review')} loading={busy === 'review'} disabled={!all.length || busy === 'quick'} style={{ flex: 1.4 }} testID="analyze" />
       </BottomBar>
     </View>
   );

@@ -63,6 +63,9 @@ interface ReminderRow {
   timezone_id: string;
   reminder_type: string;
   notification_id: string | null;
+  source_field_id?: string | null;
+  target_date?: string | null;
+  days_before?: number | null;
   enabled: number;
   completed_at: string | null;
   created_at: string;
@@ -133,6 +136,9 @@ export function toReminder(r: ReminderRow): Reminder {
     timezoneId: r.timezone_id,
     reminderType: r.reminder_type as Reminder['reminderType'],
     notificationId: r.notification_id,
+    sourceFieldId: r.source_field_id ?? null,
+    targetDate: r.target_date ?? null,
+    daysBefore: r.days_before ?? null,
     enabled: !!r.enabled,
     completedAt: r.completed_at,
     createdAt: r.created_at,
@@ -324,7 +330,7 @@ export async function deleteItemRow(id: string): Promise<{ attachmentUris: strin
 export async function countByStatus(): Promise<Record<ItemStatus, number>> {
   const db = await getDb();
   const rows = await db.getAllAsync<{ status: ItemStatus; n: number }>('SELECT status, COUNT(*) AS n FROM items GROUP BY status');
-  const out: Record<ItemStatus, number> = { draft: 0, active: 0, completed: 0, archived: 0 };
+  const out: Record<ItemStatus, number> = { draft: 0, pending: 0, active: 0, completed: 0, archived: 0 };
   for (const r of rows) out[r.status] = r.n;
   return out;
 }
@@ -375,6 +381,12 @@ export async function updateField(id: string, patch: { valueText?: string; norma
   }
   if (!sets.length) return;
   await db.runAsync(`UPDATE extracted_fields SET ${sets.join(', ')} WHERE id = ?`, ...params, id);
+}
+
+export async function getField(id: string): Promise<ExtractedField | null> {
+  const db = await getDb();
+  const row = await db.getFirstAsync<FieldRow>('SELECT * FROM extracted_fields WHERE id = ?', id);
+  return row ? toField(row) : null;
 }
 
 export async function deleteField(id: string): Promise<void> {

@@ -2,7 +2,8 @@ import type { ItemStatus } from '@/domain/models';
 
 /** Allowed status transitions. Deletion is not a status: it removes rows, files and notifications. */
 const TRANSITIONS: Record<ItemStatus, ItemStatus[]> = {
-  draft: ['active'],
+  draft: ['active', 'pending'],
+  pending: ['active'],
   active: ['completed', 'archived'],
   completed: ['active', 'archived'],
   archived: ['active'],
@@ -19,6 +20,7 @@ export function keepsReminders(status: ItemStatus): boolean {
 
 export const STATUS_LABEL: Record<ItemStatus, string> = {
   draft: '검토 전',
+  pending: '임시 저장',
   active: '진행 중',
   completed: '완료',
   archived: '보관됨',

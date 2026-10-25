@@ -33,10 +33,16 @@ tests/                   unit · share-intent · extraction-fixtures
 ## 캡처 파이프라인
 1. 입력 수집: OS 공유(raw payload) / 붙여넣기 / 선택기 → `CaptureInput[]` (`share-payload-normalizer.ts`).
 2. 파일: 앱 폴더로 복사(`attachments/<itemId>/`) → 실제 헤더로 MIME 재검증 → 크기 25MB 제한 → 파일명 정리.
-3. OCR: 이미지에 한해 `runOcr()` — 현재 provider는 "사용 불가"를 정직하게 반환.
+3. OCR: 이미지·PDF에 `runOcr()` — Android는 `modules/ddalggak-ocr`(ML Kit 한국어, 기기 내), 그 외는 "사용 불가". 실패해도 throw하지 않음.
 4. 추출: 텍스트 정규화(NFKC, 숫자 사이 O/l 보정) → 날짜/시간/금액/코드/전화/주소/상호/반품 문구 → 분류 후보.
-5. draft 저장 → 검토 화면에서 분류/값 확인·수정 → `active`.
-6. 앱 시작 시 정합성: 1일 지난 draft 삭제, 고아 첨부 폴더 삭제, 파일 없는 첨부 행 삭제, 알림 재동기화.
+5. 저장: "저장하기" = `draft` → 검토 화면에서 확인·수정 → `active`. "임시 저장" = `pending`(원본 보관 시 OCR은 나중에) → 상세의 "이어서 저장하기"로 같은 확인 화면 → `active`.
+6. 앱 시작 시 정합성: 1일 지난 draft 삭제(pending 제외), 고아 첨부 폴더 삭제, 파일 없는 첨부 행 삭제, 알림 재동기화(알림 탭 진입 때도).
+
+## 알림 경계
+- `reminder-service`만 OS 스케줄러를 호출(생성·다시 예약·다시 켜기·날짜 변경 동기화·재조정). 필드 수정은 `item-service.editField`를 거쳐 연결된 알림을 재예약/끔. 상태 표시는 `reminder-policy.deliveryState`(DB 의도 vs OS 실제 예약).
+
+## 백업
+- `export-import/archive-format.ts`(v1/v2 형식·검증·첨부 예산), `import-plan.ts`(순수: 건너뛰기·id 재발급), `export-service.ts`(파일 쓰기→해시·MIME 검증→단일 트랜잭션, 실패 시 파일 정리).
 
 ## 플랫폼 경계
 - `*.web.ts`: 파일 시스템·알림·공유 수신 대체(웹은 UI 확인 전용).

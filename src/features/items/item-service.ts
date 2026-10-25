@@ -4,8 +4,9 @@ import { wipeAllTables } from '@/infrastructure/database/database';
 import { deleteAllAppFiles, deleteFile, deleteItemFiles, fileExists, listAttachmentFolders } from '@/infrastructure/file-storage/app-files';
 import * as notifications from '@/infrastructure/notifications/local-notifications';
 
-import { disableRemindersFor } from '../reminders/reminder-service';
-import { allAttachments, allItemIds, deleteAttachmentRow, deleteItemRow, getItem, listDraftIds, setTags, updateItem } from './item-repository';
+import { unlinkField } from '../reminders/reminder-repository';
+import { disableRemindersFor, fieldSyncMessage, syncRemindersForField } from '../reminders/reminder-service';
+import { allAttachments, allItemIds, deleteAttachmentRow, deleteField, deleteItemRow, getItem, listDraftIds, setTags, updateField, updateItem } from './item-repository';
 import { canTransition, keepsReminders } from './item-lifecycle';
 
 export interface ReviewEdits {
@@ -15,7 +16,7 @@ export interface ReviewEdits {
   tags: string[];
 }
 
-/** Draft → active after the user reviewed it. Field confirmations are saved as the user taps them. */
+/** Draft/pending → active after the user reviewed it. Field confirmations are saved as the user taps them. */
 export async function confirmDraft(id: string, edits: ReviewEdits): Promise<void> {
   const item = await getItem(id);
   if (!item) throw new AppError('validation');
@@ -26,10 +27,28 @@ export async function confirmDraft(id: string, edits: ReviewEdits): Promise<void
     title,
     category: edits.category,
     userNote: edits.userNote?.trim() || null,
-    status: item.status === 'draft' ? 'active' : item.status,
+    status: item.status === 'draft' || item.status === 'pending' ? 'active' : item.status,
     needsReview: stillUnconfirmed,
   });
   await setTags(id, edits.tags);
+}
+
+export type FieldPatch = Parameters<typeof updateField>[1];
+
+/**
+ * Every field edit/confirmation goes through here so reminders made from a date follow it:
+ * moved when the date changes, switched off when it is unconfirmed. Returns a message for the UI.
+ */
+export async function editField(id: string, patch: FieldPatch, defaultHour: number): Promise<string | null> {
+  await updateField(id, patch);
+  if (patch.valueText === undefined && patch.normalizedValue === undefined && patch.userConfirmed === undefined && patch.role === undefined) return null;
+  return fieldSyncMessage(await syncRemindersForField(id, defaultHour));
+}
+
+/** Deleting an extracted value keeps the user's reminders (unlinked); they have their own delete. */
+export async function removeField(id: string): Promise<void> {
+  await unlinkField(id);
+  await deleteField(id);
 }
 
 export async function setStatus(id: string, to: ItemStatus): Promise<void> {

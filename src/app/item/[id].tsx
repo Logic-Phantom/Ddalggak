@@ -12,9 +12,11 @@ import { CATEGORY_INFO } from '@/domain/categories';
 import { toUserMessage } from '@/domain/errors';
 import { isOpenableUrl, isPrivateHost } from '@/features/extraction/url-utils';
 import { STATUS_LABEL } from '@/features/items/item-lifecycle';
-import { getItem, updateField, updateItem } from '@/features/items/item-repository';
-import { deleteItem, removeAttachment, setStatus } from '@/features/items/item-service';
-import { deleteReminder } from '@/features/reminders/reminder-service';
+import { getItem, updateItem } from '@/features/items/item-repository';
+import { deleteItem, editField, removeAttachment, setStatus } from '@/features/items/item-service';
+import { canRetryDelivery, DELIVERY_TEXT, deliveryState } from '@/features/reminders/reminder-policy';
+import { deleteReminder, nowLocal, rescheduleReminder } from '@/features/reminders/reminder-service';
+import * as notifications from '@/infrastructure/notifications/local-notifications';
 import { useAppState } from '@/hooks/app-state';
 import { useLoader } from '@/hooks/use-loader';
 import { formatBytes, formatIsoDate, formatLocal } from '@/utils/dates';
@@ -40,17 +42,33 @@ function Expandable({ title, text }: { title: string; text: string }) {
 export default function ItemScreen() {
   const router = useRouter();
   const c = useColors();
-  const { id, saved } = useLocalSearchParams<{ id: string; saved?: string }>();
+  const { id, saved, quick, skipped } = useLocalSearchParams<{ id: string; saved?: string; quick?: string; skipped?: string }>();
   const { settings, notifyDataChanged } = useAppState();
-  const { data: item, reload } = useLoader(() => getItem(id), [id]);
+  const { data, reload } = useLoader(async () => {
+    const [found, permission, scheduled] = await Promise.all([
+      getItem(id),
+      notifications.getPermission().catch(() => 'unavailable' as const),
+      notifications.scheduledIds().catch(() => [] as string[]),
+    ]);
+    return { item: found, permission, scheduledIds: new Set(scheduled) };
+  }, [id]);
+  const item = data === undefined ? undefined : data.item;
   const [sheet, setSheet] = useState(false);
-  const [message, setMessage] = useState<{ tone: 'success' | 'error' | 'info'; text: string } | null>(saved ? { tone: 'success', text: '저장했어요. 필요하면 알림을 만들어 보세요.' } : null);
+  const [message, setMessage] = useState<{ tone: 'success' | 'error' | 'info'; text: string } | null>(
+    saved
+      ? { tone: 'success', text: '저장했어요. 필요하면 알림도 만들어 보세요.' }
+      : quick
+        ? { tone: 'success', text: '임시 저장했어요. 시간 날 때 ‘이어서 저장하기’로 마무리해 주세요.' }
+        : null,
+  );
 
   if (item === null) return <EmptyState title="항목을 찾을 수 없어요" message="삭제된 항목일 수 있어요." actionLabel="홈으로" onAction={() => router.replace('/')} />;
   if (!item) return null;
 
   const cat = CATEGORY_INFO[item.category];
-  const act = async (fn: () => Promise<void>, done?: string) => {
+  const pending = item.status === 'pending';
+  const review = () => router.push({ pathname: '/capture/review', params: { id: item.id } });
+  const act =async (fn: () => Promise<void>, done?: string) => {
     try {
       await fn();
       notifyDataChanged();
@@ -90,11 +108,33 @@ export default function ItemScreen() {
     ]);
 
   const fields = item.fields.filter((f) => f.fieldType !== 'url');
+  const delivery = { scheduledIds: data!.scheduledIds, permission: data!.permission, nowLocal: nowLocal() };
+
+  const reschedule = (reminderId: string) =>
+    act(async () => {
+      const r = await rescheduleReminder(reminderId);
+      setMessage(
+        r.scheduled
+          ? { tone: 'success', text: '기기 알림을 다시 예약했어요.' }
+          : r.failed
+            ? { tone: 'error', text: '기기 알림을 예약하지 못했어요. 잠시 후 다시 시도해 주세요. 일정은 알림 탭에서 계속 볼 수 있어요.' }
+            : { tone: 'info', text: r.permission === 'unavailable' ? DELIVERY_TEXT.unavailable : '알림 권한이 꺼져 있어요. 기기 설정 > 딸깍에서 알림을 허용한 뒤 다시 시도해 주세요.' },
+      );
+    });
 
   return (
     <View style={{ flex: 1 }}>
       <ScreenScroll>
         {message ? <InlineMessage tone={message.tone} message={message.text} /> : null}
+        {skipped ? <InlineMessage tone="warning" message={skipped} /> : null}
+        {pending ? (
+          <InlineMessage
+            tone="info"
+            title="임시 저장된 항목이에요"
+            message="찾은 날짜·금액은 아직 확인 전이에요. 저장을 마치면 알림을 만들 수 있어요."
+            action={<GhostButton compact icon="checkmark" label="이어서 저장하기" onPress={review} testID="review-pending" />}
+          />
+        ) : null}
 
         {item.attachments.find((a) => a.mimeType.startsWith('image/')) ? (
           <Image
@@ -111,7 +151,7 @@ export default function ItemScreen() {
             <CategoryIcon category={item.category} size={28} />
             <StatusBadge label={cat.label} tone="accent" />
             {item.status !== 'active' ? <StatusBadge label={STATUS_LABEL[item.status]} /> : null}
-            {item.needsReview ? <StatusBadge label="검토 필요" icon="alert-circle-outline" tone="warning" /> : null}
+            {item.needsReview && !pending ? <StatusBadge label="검토 필요" icon="alert-circle-outline" tone="warning" /> : null}
           </Row>
           <Row gap={spacing.xs} style={{ alignItems: 'flex-start' }}>
             <AppText variant="title" style={{ flex: 1 }} selectable>{item.title}</AppText>
@@ -138,7 +178,17 @@ export default function ItemScreen() {
         <View style={{ gap: spacing.sm }}>
           <SectionHeader title="정보" subtitle={fields.length ? '‘이 값이 맞아요’를 누른 날짜만 알림에 쓸 수 있어요.' : '찾은 값이 없어요. 수정에서 직접 추가할 수 있어요.'} />
           {fields.map((f) => (
-            <ExtractedFieldRow key={f.id} field={f} maskByDefault onConfirm={(v) => act(() => updateField(f.id, { userConfirmed: v }))} />
+            <ExtractedFieldRow
+              key={f.id}
+              field={f}
+              maskByDefault
+              onConfirm={(v) =>
+                act(async () => {
+                  const m = await editField(f.id, { userConfirmed: v }, settings.defaultReminderHour);
+                  if (m) setMessage({ tone: 'info', text: m });
+                })
+              }
+            />
           ))}
         </View>
 
@@ -146,24 +196,33 @@ export default function ItemScreen() {
           <SectionHeader title="알림" right={item.status === 'active' ? <GhostButton compact icon="add" label="만들기" onPress={() => setSheet(true)} testID="add-reminder" /> : undefined} />
           {item.reminders.length ? (
             <Card padded={false}>
-              {item.reminders.map((r, i) => (
-                <View key={r.id}>
-                  {i ? <Divider inset={spacing.md} /> : null}
-                  <Row gap={spacing.sm} style={{ padding: spacing.md }}>
-                    <Ionicons name={r.enabled ? 'notifications-outline' : 'notifications-off-outline'} size={20} color={c.textSecondary} />
-                    <View style={{ flex: 1 }}>
-                      <AppText variant="body">{formatLocal(r.scheduledAt)}</AppText>
-                      <AppText variant="caption" tone="tertiary">
-                        {r.title} · {!r.enabled ? '꺼짐 (보관·완료된 항목)' : r.notificationId ? '기기 알림 예약됨' : '앱 안에서만 표시 (기기 알림 없음)'}
-                      </AppText>
-                    </View>
-                    <IconButton icon="trash-outline" label="알림 삭제" onPress={() => act(() => deleteReminder(r.id), '알림을 삭제했어요.')} />
-                  </Row>
-                </View>
-              ))}
+              {item.reminders.map((r, i) => {
+                const state = deliveryState(r, delivery);
+                const canReenable = state === 'off' && item.status === 'active';
+                return (
+                  <View key={r.id}>
+                    {i ? <Divider inset={spacing.md} /> : null}
+                    <Row gap={spacing.sm} style={{ padding: spacing.md }}>
+                      <Ionicons name={state === 'scheduled' ? 'notifications-outline' : 'notifications-off-outline'} size={20} color={state === 'scheduled' ? c.textSecondary : c.warning} />
+                      <View style={{ flex: 1, gap: 2 }}>
+                        <AppText variant="body">{formatLocal(r.scheduledAt)}</AppText>
+                        <AppText variant="caption" tone={state === 'scheduled' || state === 'off' || state === 'past' ? 'tertiary' : 'warning'}>
+                          {r.title} · {DELIVERY_TEXT[state]}
+                        </AppText>
+                        {canRetryDelivery(state) || canReenable ? (
+                          <View style={{ alignSelf: 'flex-start' }}>
+                            <GhostButton compact icon="refresh" label={canReenable ? '다시 켜기' : '다시 예약'} onPress={() => reschedule(r.id)} />
+                          </View>
+                        ) : null}
+                      </View>
+                      <IconButton icon="trash-outline" label="알림 삭제" onPress={() => act(() => deleteReminder(r.id), '알림을 삭제했어요.')} />
+                    </Row>
+                  </View>
+                );
+              })}
             </Card>
           ) : (
-            <AppText variant="secondary" tone="secondary">아직 알림이 없어요. 알림은 자동으로 만들지 않아요.</AppText>
+            <AppText variant="secondary" tone="secondary">아직 알림이 없어요.</AppText>
           )}
         </View>
 
@@ -196,15 +255,19 @@ export default function ItemScreen() {
         {item.ocrText ? <Expandable title="이미지에서 읽은 글자" text={item.ocrText} /> : null}
 
         <View style={{ gap: spacing.xs }}>
-          <PrimaryButton icon="create-outline" label="수정" onPress={() => router.push({ pathname: '/item/edit/[id]', params: { id: item.id } })} />
+          {pending ? (
+            <PrimaryButton icon="checkmark" label="이어서 저장하기" onPress={review} />
+          ) : (
+            <PrimaryButton icon="create-outline" label="수정" onPress={() => router.push({ pathname: '/item/edit/[id]', params: { id: item.id } })} />
+          )}
           <Row gap={spacing.xs}>
-            {item.status === 'active' ? (
+            {pending ? null : item.status === 'active' ? (
               <>
-                <SecondaryButton label="완료" icon="checkmark-done-outline" onPress={() => act(() => setStatus(item.id, 'completed'), '완료했어요. 보관함의 완료 탭에서 볼 수 있고, 알림은 꺼졌어요.')} style={{ flex: 1 }} />
-                <SecondaryButton label="보관" icon="archive-outline" onPress={() => act(() => setStatus(item.id, 'archived'), '보관했어요. 보관함의 보관됨 탭에서 볼 수 있고, 알림은 꺼졌어요.')} style={{ flex: 1 }} />
+                <SecondaryButton label="완료" icon="checkmark-done-outline" onPress={() => act(() => setStatus(item.id, 'completed'), '완료했어요. 알림은 꺼졌어요.')} style={{ flex: 1 }} />
+                <SecondaryButton label="보관" icon="archive-outline" onPress={() => act(() => setStatus(item.id, 'archived'), '보관했어요. 알림은 꺼졌어요.')} style={{ flex: 1 }} />
               </>
             ) : (
-              <SecondaryButton label="진행 중으로 되돌리기" icon="arrow-undo-outline" onPress={() => act(() => setStatus(item.id, 'active'), '진행 중으로 되돌렸어요. 필요하면 알림을 다시 만들어 주세요.')} style={{ flex: 1 }} />
+              <SecondaryButton label="진행 중으로 되돌리기" icon="arrow-undo-outline" onPress={() => act(() => setStatus(item.id, 'active'), item.reminders.length ? '다시 진행 중이에요. 알림은 ‘다시 켜기’로 켤 수 있어요.' : '다시 진행 중이에요.')} style={{ flex: 1 }} />
             )}
           </Row>
           <DangerButton label="삭제" icon="trash-outline" onPress={confirmDelete} />

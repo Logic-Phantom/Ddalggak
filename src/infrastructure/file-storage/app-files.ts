@@ -92,13 +92,36 @@ export function appStorageBytes(): number {
   return root.size ?? 0;
 }
 
-/** Writes a text file to the cache directory (export) and returns its URI. */
-export function writeCacheText(fileName: string, content: string): string {
+/** Writes a text file to the cache directory (export) and returns its URI once fully written. */
+export async function writeCacheText(fileName: string, content: string): Promise<string> {
   const f = new File(Paths.cache, fileName);
   if (f.exists) f.delete();
   f.create();
-  f.write(content);
+  await f.write(content);
   return f.uri;
+}
+
+/** Whole file as base64 (backup export). */
+export async function readBase64(uri: string): Promise<string> {
+  return new File(uri).base64();
+}
+
+/** Lowercase hex SHA-256 of a local file. */
+export async function sha256File(uri: string): Promise<string> {
+  return (await new File(uri).digest('SHA-256')).toLowerCase();
+}
+
+/** Restores a backed-up file into the item's attachment folder. `fileName` must already be sanitized. */
+export async function writeAttachmentBase64(itemId: string, fileName: string, base64: string): Promise<string> {
+  const target = new File(dir('attachments', itemId), fileName);
+  try {
+    if (target.exists) target.delete();
+    target.create();
+    await target.write(base64, { encoding: 'base64' });
+    return target.uri;
+  } catch (e) {
+    throw new AppError('storage-failed', undefined, e);
+  }
 }
 
 export async function readText(uri: string): Promise<string> {

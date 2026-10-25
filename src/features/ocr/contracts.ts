@@ -1,7 +1,6 @@
 /**
- * OCR contract. Engines (iOS Vision, Android ML Kit Korean, …) plug in behind this interface so
- * the UI never knows which engine ran. Engine selection is pending the Phase 0 POC
- * (docs/OCR_AND_EXTRACTION.md); until then the app ships the `unavailable` provider.
+ * OCR contract. Engines (Android ML Kit Korean today, iOS Vision later) plug in behind this
+ * interface so the UI never knows which engine ran. See docs/OCR_AND_EXTRACTION.md.
  */
 export interface OcrLine {
   text: string;
@@ -17,6 +16,9 @@ export interface OcrResult {
   engine: string;
   engineVersion?: string;
   durationMs: number;
+  /** Documents only: total pages and how many were recognized (the rest were skipped). */
+  pageCount?: number;
+  pagesRead?: number;
 }
 
 export interface OcrProvider {
@@ -25,10 +27,16 @@ export interface OcrProvider {
   isAvailable(): Promise<boolean>;
   /** Recognizes text in a local image file URI. Must not upload anything. */
   recognize(imageUri: string, options: { languageHints: string[] }): Promise<OcrResult>;
+  /** Optional: renders the first pages of a local PDF and recognizes them. Must not upload anything. */
+  recognizeDocument?(uri: string, options: { languageHints: string[]; maxPages: number }): Promise<OcrResult>;
 }
+
+export type OcrFailureReason = 'memory' | 'file' | 'pdf-protected' | 'pdf-invalid' | 'timeout' | 'engine';
 
 export type OcrOutcome =
   | { status: 'done'; result: OcrResult }
+  /** The engine ran but found no text. */
+  | { status: 'empty'; result: OcrResult }
   | { status: 'unavailable' }
   | { status: 'unsupported-type' }
-  | { status: 'failed' };
+  | { status: 'failed'; reason: OcrFailureReason };

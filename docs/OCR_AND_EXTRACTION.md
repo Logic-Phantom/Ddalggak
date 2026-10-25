@@ -1,9 +1,32 @@
 # OCR 및 정보 추출
 
-## 현재 상태 (2026-10-24)
-- **OCR: 미연결.** `OcrProvider` 계약과 서비스만 있고, 실제 provider는 `unavailable`(항상 "사용 불가" 반환). 가짜 OCR 결과를 만들지 않음.
-- **규칙 기반 추출: 구현·단위 테스트 완료.** 공유/붙여넣기 텍스트에 대해 동작. OCR이 연결되면 같은 파이프라인을 `method: 'ocr'`로 탄다(신뢰도 최대 medium으로 제한).
-- PDF 텍스트/래스터화는 지원하지 않음(안내 문구 표시).
+## 현재 상태 (2026-10-25)
+| 범위 | 상태 |
+|---|---|
+| Android 이미지 OCR (ML Kit 한국어 번들 모델) | **코드 구현**, 네이티브 빌드·실기기 **미검증** |
+| Android PDF (앞 3쪽 렌더링 후 OCR) | **코드 구현**, 미검증. 텍스트 PDF도 렌더링해 같은 엔진으로 읽음(내장 텍스트 직접 추출은 하지 않음) |
+| iOS | 미연결 — 항상 "이 기기·버전에서는 글자 인식을 쓸 수 없어요" |
+| 웹·Expo Go | 네이티브 모듈 없음 → 미연결 |
+| OCR 결과 → 규칙 추출 연결 | 구현·단위 테스트(가짜 provider) 통과 |
+| 정확도 | **측정 없음** |
+
+### 구조
+- 네이티브: `modules/ddalggak-ocr/android/.../DdalggakOcrModule.kt` — `recognizeImage(uri, maxSide)`, `recognizePdf(uri, maxPages, maxSide)`, `isAvailable()`. 오류는 코드만(`ERR_OCR_MEMORY`, `ERR_OCR_FILE`, `ERR_OCR_DECODE`, `ERR_OCR_PDF_PROTECTED`, `ERR_OCR_PDF_INVALID`, `ERR_OCR_ENGINE`), 메시지에 경로·글자를 넣지 않음.
+- JS: `modules/ddalggak-ocr/index.ts`(`requireOptionalNativeModule`) → `src/features/ocr/mlkit-provider.ts`(OcrProvider) → `ocr-service.ts`의 `runOcr()`가 기본으로 선택. 모듈이 없으면 `unavailable-provider`.
+- `runOcr`는 절대 throw하지 않음: `done / empty / unavailable / unsupported-type / failed(reason)`. 60초 타임아웃.
+- 이미지 처리: 2의 거듭제곱 샘플링으로 긴 변 ≤ 3072px, EXIF 회전 반영(ML Kit 권장: 글자당 16px 이상). HEIC는 Android 9+의 BitmapFactory 지원에 의존.
+- 캡처: 원본 복사·검증 → OCR → 공유 텍스트와 OCR 텍스트를 각각 규칙 추출(OCR은 `method: 'ocr'`, 신뢰도 최대 medium) → 모두 **확인 전 후보**. OCR 실패·빈 결과에도 원본과 입력 텍스트는 저장.
+- 나중에 읽기/다시 시도: 검토 화면의 "이미지 글자 읽기 / 다시 시도"(`analyzeAttachments`) — 보관된 첨부로 다시 인식하고 `mergeReanalysis`로 합쳐 사용자가 확인·수정·직접 입력한 값은 그대로 둠. 상대 날짜는 캡처일 기준.
+- 설정: "이미지·PDF 글자 인식"(ocrEnabled) 끄면 호출 안 함. "이미지 원문 텍스트 저장"(storeOcrText) 끄면 `ocr_text`를 저장하지 않음(추출 필드의 근거 줄은 남음).
+- 네트워크: 앱은 이미지를 업로드하지 않음. ML Kit 자체의 진단 정보 전송은 PRIVACY.md 참고.
+
+### Android 기기 QA 절차 (미실행)
+1. `npx eas-cli@latest build --profile development --platform android`(또는 preview APK) — 네이티브 모듈이 포함된 새 빌드 필요.
+2. 직접 만든 합성 이미지(쿠폰·영수증·예약·포스터, 회전된 사진, 작은 글자, 흐린 사진)와 텍스트 PDF·스캔 PDF·암호 PDF 준비(실제 개인 자료 금지).
+3. 갤러리 공유/사진 선택으로 각 파일 → 저장하기 → 날짜·금액·코드 후보와 근거 확인, 틀린 값 수정 → 저장.
+4. 임시 저장 → 검토 → "이미지 글자 읽기" → 수정한 값이 유지되는지.
+5. 설정에서 글자 인식 끄기 → "설정에서 꺼 두었어요" 안내 확인.
+6. 처리 시간·메모리·APK 크기 증가를 기록해 이 문서에 실측값으로 남김.
 
 ## OCR 엔진 후보와 POC 계획
 | 후보 | 장점 | 확인할 것 |
@@ -35,3 +58,4 @@ POC 절차: ① 직접 만든 합성 이미지(영수증·쿠폰·예약·포스
 ## 테스트
 - `tests/unit/date-parser.test.ts`, `money-and-codes.test.ts`, `url-and-category.test.ts`, `policies.test.ts`
 - `tests/extraction-fixtures/fixtures.json`: 직접 작성한 **가상 텍스트 8건**(영수증, 쿠폰, 예약, 행사, 보증서, 쇼핑 공유, 한영 혼합, OCR 손상 흉내). 실제 OCR 이미지 정확도 측정은 아님.
+- `tests/unit/ocr-and-capture.test.ts`: 가짜 provider로 성공·빈 결과·오류·타임아웃·미지원 형식·PDF 경로, OCR 텍스트 → 날짜/금액/코드 추출, 확인 전 상태 유지, OTP·비밀번호 제외, 제목 코드 마스킹, 원문 저장 끄기, OCR 실패 시 원본·입력 텍스트 보존, 재분석이 사용자 값을 덮어쓰지 않음. **네이티브 엔진 자체는 테스트하지 않음.**

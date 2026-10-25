@@ -9,19 +9,22 @@
 - 공유된 URL을 앱이 자동으로 조회하거나 스크래핑하지 않음
 - 자동 추출값은 근거·신뢰도와 함께 보여 주고, 확인 전 값으로는 알림을 만들지 않음
 
-## 현재 지원 범위 (2026-10-24)
+## 현재 지원 범위 (2026-10-25)
+
+"구현"은 코드와 자동 테스트까지, "실기기 확인"은 Galaxy Z Flip5에서 직접 본 것만 뜻합니다.
 
 | 기능 | 상태 |
 |---|---|
-| 텍스트/URL 직접 입력·붙여넣기 | 구현, 웹 프리뷰에서 확인 |
+| 텍스트/URL 직접 입력·붙여넣기 | 구현, 실기기 확인 |
 | 사진/문서(PDF·이미지) 선택 | 구현, 기기 미검증 |
-| 외부 앱 공유 수신 (Android intent / iOS Share Extension) | 설정·코드 구현, **실기기 미검증** ([지원표](docs/SHARE_RECEIVING_POC.md)) |
+| 외부 앱 공유 수신 (Android intent / iOS Share Extension) | Android 텍스트 공유 실기기 확인, 이미지 공유·iOS 미검증 ([지원표](docs/SHARE_RECEIVING_POC.md)) |
 | 한국어 날짜·시간·금액·코드·주소 규칙 추출 | 구현, 단위/fixture 테스트 통과 |
-| 이미지 OCR | **미연결** — OCR 계약만 있고 "지원하지 않음"을 안내 ([계획](docs/OCR_AND_EXTRACTION.md)) |
+| 이미지·PDF OCR (Android, ML Kit 한국어 기기 내 모델) | **코드 구현 — 네이티브 빌드·실기기·정확도 미검증**. iOS는 미연결 ([OCR](docs/OCR_AND_EXTRACTION.md), [개인정보](docs/PRIVACY.md)) |
+| 임시 저장 → 이어서 저장하기 | 구현·단위 테스트, 실기기 미검증 |
 | 분류 후보, 검토·수정·확인 UI | 구현 |
-| 로컬 알림 (확인된 날짜만) | 구현, 기기 알림 전달 미검증 |
+| 로컬 알림 (확인된 날짜만, 날짜 수정 시 재예약, 예약 상태 표시) | 구현·단위 테스트, 예약·완료 취소는 이전 빌드에서 실기기 확인, 새 동작 미검증 |
 | 검색·분류·태그·보관·완료·삭제 | 구현 |
-| JSON 내보내기/가져오기, 전체 삭제 | 구현 (첨부 파일은 내보내기에 미포함) |
+| 백업 내보내기/가져오기(첨부 포함 선택, 30MB까지), 전체 삭제 | 구현·단위 테스트, 실기기 미검증. 백업 파일은 암호화되지 않음 |
 | iOS | 빌드 환경 없음(Windows) → 전부 미검증 |
 
 공유 수신 동작은 OS 버전과 보내는 앱(카카오톡 등)에 따라 달라질 수 있으며, 앱이 노출한 공유 데이터만 받을 수 있습니다. 공유가 안 되는 경우에도 앱 안의 붙여넣기·사진 선택·파일 선택은 동작합니다.
@@ -77,6 +80,7 @@ src/design-system/   토큰과 공용 컴포넌트
 src/domain/          모델·분류 라벨·오류
 src/features/        incoming-share, capture, ocr, extraction, items, reminders, search, export-import, preferences
 src/infrastructure/  SQLite, 파일 저장소, 로컬 알림 (+ 웹 대체 구현)
+modules/ddalggak-ocr/ 로컬 Expo 네이티브 모듈 (Android ML Kit 한국어 OCR + PdfRenderer)
 tests/               unit, share-intent, extraction-fixtures(가상 텍스트)
 scripts/             앱 아이콘 생성, 라이선스 감사, Android 기기 QA
 docs/                아키텍처·결정·POC·개인정보·위협 모델·라이선스·비용·테스트·로드맵
@@ -86,7 +90,7 @@ docs/                아키텍처·결정·POC·개인정보·위협 모델·라
 
 ## 개인정보
 
-모든 데이터는 기기 안에만 저장되며 기본 기능은 네트워크를 쓰지 않습니다. 데이터베이스와 첨부 파일은 **암호화되어 있지 않고** OS 앱 격리에 의존합니다. 분석·광고·크래시 리포트 SDK는 없습니다. 설정에서 내보내기·전체 삭제가 가능합니다.
+모든 데이터는 기기 안에만 저장되며 앱은 저장한 내용을 기기 밖으로 보내지 않습니다. 단, Android 글자 인식에 쓰는 Google ML Kit는 Google 문서상 이미지 내용이 아닌 진단 정보를 Google에 보낼 수 있으며, 설정에서 글자 인식을 끌 수 있습니다([PRIVACY](docs/PRIVACY.md)). 데이터베이스와 첨부 파일은 **암호화되어 있지 않고** OS 앱 격리에 의존합니다. 분석·광고·크래시 리포트 SDK는 없습니다. 설정에서 내보내기·전체 삭제가 가능합니다.
 
 ## 작업 내역 (Work Log)
 
@@ -202,3 +206,27 @@ docs/                아키텍처·결정·POC·개인정보·위협 모델·라
 **실행한 명령과 결과**
 - `npx jest` — 124 통과 / 0 실패, `npx tsc --noEmit` — 통과, `npx expo lint` — 통과
 - 실기기 기능 테스트(공유 수신·사진/파일 선택·알림): **미실행** — 사용자가 APK로 직접 확인 예정
+
+### 2026-10-25 — 한국어 OCR(Android)·임시 저장·알림 안정화·첨부 포함 백업
+
+**구현**
+- OCR: 로컬 Expo 모듈 `modules/ddalggak-ocr`(Kotlin, Android 전용) — ML Kit 한국어 **번들** 모델(`text-recognition-korean:16.0.1`, 오프라인), 긴 변 3072px 샘플링·EXIF 회전, PDF는 `PdfRenderer`로 앞 3쪽. `OcrProvider` 계약 유지(`mlkit-provider.ts`), 모듈이 없는 빌드(iOS·웹·Expo Go)는 "사용할 수 없음". `runOcr`는 실패를 사유(메모리·파일·암호 PDF·타임아웃 등)로 돌려주고 원본 저장을 막지 않음. 검토 화면에 "이미지 글자 읽기 / 다시 시도"(사용자 값 보존). 설정에 "이미지·PDF 글자 인식" 끄기 (D-015, D-019).
+- 임시 저장: 새 상태 `pending`("임시 저장"). 추가 화면에 "임시 저장" 버튼, 확인 화면에도 "임시 저장", 홈 배너·보관함 탭·상세 "이어서 저장하기". 알림 불가, 자동 삭제 없음, 연타·동시 저장 방지, DB 실패 시 복사 파일 삭제 (D-016).
+- 알림: 마이그레이션 v2(`source_field_id`, `target_date`, `days_before`). 날짜 수정 시 취소 후 재예약, 확인 해제 시 끔, 예약 상태를 사실대로 표시(예약됨/권한 꺼짐/예약 실패/기기 예약 없음 등), "다시 예약"·"다시 켜기", 앱 시작·알림 탭에서 멱등 재조정, 60개 한도 안내 (D-017).
+- 백업 v2: "첨부 없이" / "첨부 포함"(base64 + SHA-256, 총 30MB). 저장 전 포함·제외 개수와 이유 표시, v1 가져오기 호환, 경로 안전 id·MIME·해시 검증 후 단일 트랜잭션, 실패 시 쓴 파일 삭제, 기존 항목 건너뜀, 알림은 꺼진 채 복원 (D-018).
+- 버그 수정: 내보내기 파일을 다 쓰기 전에 공유 시트를 열 수 있던 문제(`write` 미대기).
+- 문구 정리(사용자 요청): 홈 헤드라인 "오늘도, 필요한 정보를 딸깍", 검색창 "무엇을 찾을까요?". 버튼 "정리하기" → **"저장하기"**(추가 화면) / "저장 완료"(확인 화면), 임시 저장 항목은 "이어서 저장하기", 상태·탭 이름 "정리 필요" → "임시 저장". 화면 제목 "정보 확인하기" → "저장 전 확인", "상세보기" → "상세", "저장·데이터 설정" → "설정". 중복·장황한 안내문(기기 안 처리 반복 문구, 완료/보관 후 위치 설명 등) 축약. "보관"은 기존대로 '보관됨(아카이브)' 의미로만 사용해 저장과 혼동하지 않게 함.
+- 개인정보 고지: ML Kit가 이미지 내용이 아닌 진단 정보를 Google에 보낼 수 있음을 설정·개인정보 화면·PRIVACY.md에 기재.
+
+**주요 파일**: `modules/ddalggak-ocr/**`, `src/features/ocr/**`, `src/features/capture/capture-service.ts`, `src/features/reminders/**`, `src/features/export-import/**`, `src/features/items/**`, `src/infrastructure/database/migrations.ts`, `src/infrastructure/file-storage/*`, `src/app/**`(capture, item, tabs, settings, privacy), `tests/unit/{ocr-and-capture,reminders,backup}.test.ts`, `docs/**`
+
+**실행한 명령과 결과**
+- 기준선: `npx jest` 127 통과, `tsc`·`expo lint` 통과
+- 최종: `npx jest` **173 통과 / 0 실패**(신규 46), `npx tsc --noEmit` 통과, `npx expo lint` 통과, `npx expo-doctor` 20/20, `git diff --check` 이상 없음
+
+**검증 범위**
+- 자동 테스트는 모두 mock 기반(가짜 OCR provider·메모리 DB·가짜 알림 스케줄러). 실제 ML Kit 인식, 네이티브 모듈 컴파일, 기기 알림 전달, 첨부 백업 복원은 **미검증**.
+- Kotlin 모듈은 이 PC에서 컴파일하지 않음(로컬 Gradle 빌드 실패 이력, EAS 빌드는 계정 사용이 필요해 미실행). 새 빌드 전까지 기존 APK에는 이번 변경이 없음.
+- iOS: 미연결·미검증. 정확도 실측 없음.
+
+**남은 결정·후속**: OCR 기본값(ML Kit 진단 전송 관련) 소유자 결정 → EAS 빌드로 컴파일·실기기 QA(`docs/TESTING.md` 체크리스트) → 백업 암호화·대용량 백업 형식 → iOS Vision.

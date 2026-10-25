@@ -28,8 +28,9 @@ import { toUserMessage } from '@/domain/errors';
 import { CATEGORIES, type Category, type ExtractedField, type FieldType, type ItemDetail } from '@/domain/models';
 import { categoryHint, classify, fieldSignal } from '@/features/extraction/category-classifier';
 import { formatMoney, toMinor } from '@/features/extraction/money-parser';
-import { addField, deleteField, updateField } from '@/features/items/item-repository';
-import { confirmDraft } from '@/features/items/item-service';
+import { addField } from '@/features/items/item-repository';
+import { confirmDraft, editField, removeField, type FieldPatch } from '@/features/items/item-service';
+import { useAppState } from '@/hooks/app-state';
 import { formatLocal, parseUserDateInput } from '@/utils/dates';
 import { newId } from '@/utils/id';
 
@@ -79,6 +80,8 @@ export interface ItemEditorProps {
   reload: () => void;
   onSaved: () => void;
   onCancel: () => void;
+  /** Defaults to 버리기 (review) / 취소 (edit). */
+  cancelLabel?: string;
   /** Shown above the form (OCR status, duplicate warning…). */
   notices?: React.ReactNode;
 }
@@ -87,13 +90,15 @@ export interface ItemEditorProps {
  * Review/edit form. Category is a suggestion the user can change; each field must be confirmed
  * or edited explicitly. Nothing here schedules reminders — that happens on the item screen.
  */
-export function ItemEditor({ item, mode, reload, onSaved, onCancel, notices }: ItemEditorProps) {
+export function ItemEditor({ item, mode, reload, onSaved, onCancel, cancelLabel, notices }: ItemEditorProps) {
   const [title, setTitle] = useState(item.title);
   const [category, setCategory] = useState<Category>(item.category);
   const [note, setNote] = useState(item.userNote ?? '');
   const [tags, setTags] = useState(item.tags.join(', '));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [info, setInfo] = useState<string | null>(null);
+  const { settings } = useAppState();
   const [addType, setAddType] = useState<FieldType | null>(null);
   const [addValue, setAddValue] = useState('');
   const [addError, setAddError] = useState<string | null>(null);
@@ -106,6 +111,11 @@ export function ItemEditor({ item, mode, reload, onSaved, onCancel, notices }: I
   })[0];
   const unconfirmed = item.fields.filter((f) => f.requiresConfirmation && !f.userConfirmed && f.fieldType !== 'url');
   const ordered = [...item.fields.filter((f) => f.fieldType !== 'url')].sort((a, b) => Number(b.fieldType === 'date') - Number(a.fieldType === 'date'));
+
+  const edit = async (id: string, patch: FieldPatch) => {
+    const message = await editField(id, patch, settings.defaultReminderHour);
+    if (message) setInfo(message);
+  };
 
   const run = async (fn: () => Promise<void>) => {
     try {
@@ -175,7 +185,7 @@ export function ItemEditor({ item, mode, reload, onSaved, onCancel, notices }: I
   const confirmDelete = (f: ExtractedField) =>
     Alert.alert('이 값을 지울까요?', '추출된 값만 지워지고 원문은 그대로 남아요.', [
       { text: '취소', style: 'cancel' },
-      { text: '삭제', style: 'destructive', onPress: () => run(() => deleteField(f.id)) },
+      { text: '삭제', style: 'destructive', onPress: () => run(() => removeField(f.id)) },
     ]);
 
   return (
@@ -205,13 +215,14 @@ export function ItemEditor({ item, mode, reload, onSaved, onCancel, notices }: I
             title="찾은 정보"
             subtitle={ordered.length ? '자동으로 찾은 값은 후보예요. 맞는 값만 확인해 주세요.' : '찾은 값이 없어요. 필요한 정보를 직접 추가할 수 있어요.'}
           />
+          {info ? <InlineMessage tone="info" message={info} /> : null}
           {ordered.map((f) => (
             <ExtractedFieldRow
               key={f.id}
               field={f}
               maskByDefault={mode === 'edit'}
-              onConfirm={(v) => run(() => updateField(f.id, { userConfirmed: v }))}
-              onEdit={(e) => run(() => updateField(f.id, { ...e, userConfirmed: true, edited: true }))}
+              onConfirm={(v) => run(() => edit(f.id, { userConfirmed: v }))}
+              onEdit={(e) => run(() => edit(f.id, { ...e, userConfirmed: true, edited: true }))}
               onDelete={() => confirmDelete(f)}
             />
           ))}
@@ -253,8 +264,8 @@ export function ItemEditor({ item, mode, reload, onSaved, onCancel, notices }: I
             {unconfirmed.length ? `확인이 필요한 값 ${unconfirmed.length}개 — 확인 전 값으로는 알림을 만들지 않아요.` : '확인된 값만 알림·기한에 쓰여요.'}
           </AppText>
         }>
-        <SecondaryButton label={mode === 'review' ? '버리기' : '취소'} onPress={onCancel} style={{ flex: 1 }} />
-        <PrimaryButton label={mode === 'review' ? '저장하기' : '수정 완료'} onPress={save} loading={saving} style={{ flex: 2 }} testID="save-item" />
+        <SecondaryButton label={cancelLabel ?? (mode === 'review' ? '버리기' : '취소')} onPress={onCancel} style={{ flex: 1 }} />
+        <PrimaryButton label={mode === 'review' ? '저장 완료' : '수정 완료'} onPress={save} loading={saving} style={{ flex: 2 }} testID="save-item" />
       </BottomBar>
     </View>
   );

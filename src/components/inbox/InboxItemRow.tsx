@@ -26,7 +26,8 @@ export function InboxItemRow({ item, nextDate, thumbnail, onPress }: InboxItemRo
   const dateLabel = nextDate?.normalizedValue
     ? `${fieldLabel('date', nextDate.role)} ${formatLocal(nextDate.normalizedValue)}${nextDate.userConfirmed ? '' : ' (확인 전)'}`
     : `${formatIsoDate(item.capturedAt)} 저장`;
-  const a11y = [item.title, cat.label, dateLabel, nextDate?.normalizedValue ? dDayLabel(nextDate.normalizedValue) : null, item.needsReview ? '검토 필요' : null, item.pinned ? '고정됨' : null]
+  const pending = item.status === 'pending';
+  const a11y = [item.title, cat.label, dateLabel, nextDate?.normalizedValue ? dDayLabel(nextDate.normalizedValue) : null, pending ? '임시 저장' : item.needsReview ? '검토 필요' : null, item.pinned ? '고정됨' : null]
     .filter(Boolean)
     .join(', ');
 
@@ -53,7 +54,11 @@ export function InboxItemRow({ item, nextDate, thumbnail, onPress }: InboxItemRo
         </AppText>
         {item.needsReview || item.tags.length ? (
           <View style={[styles.row, { flexWrap: 'wrap' }]}>
-            {item.needsReview ? <StatusBadge label="검토 필요" icon="alert-circle-outline" tone="warning" /> : null}
+            {pending ? (
+              <StatusBadge label="임시 저장" icon="time-outline" tone="accent" />
+            ) : item.needsReview ? (
+              <StatusBadge label="검토 필요" icon="alert-circle-outline" tone="warning" />
+            ) : null}
             {item.tags.slice(0, 2).map((t) => <StatusBadge key={t} label={`#${t}`} />)}
           </View>
         ) : null}

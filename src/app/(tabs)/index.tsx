@@ -49,10 +49,10 @@ export default function HomeScreen() {
   const { ready, dbError, retry } = useAppState();
 
   const { data, error } = useLoader(async () => {
-    const items = await listItems({ statuses: ['active'] });
+    const [items, pending] = await Promise.all([listItems({ statuses: ['active'] }), listItems({ statuses: ['pending'], limit: 100 })]);
     const ids = items.map((i) => i.id);
     const [dates, thumbs] = await Promise.all([upcomingDates(ids, toYmd(new Date())), firstImages(ids)]);
-    return { items, dates, thumbs };
+    return { items, pendingCount: pending.length, dates, thumbs };
   });
 
   if (dbError) return <ErrorState title="데이터를 열지 못했어요" message="기기 저장 공간을 확인한 뒤 다시 시도해 주세요. 저장된 데이터는 지워지지 않았어요." onRetry={retry} />;
@@ -82,15 +82,15 @@ export default function HomeScreen() {
         </Pressable>
       </View>
 
-      <AppText variant="screenTitle" accessibilityRole="header">오늘도, 필요한 정보를{'\n'}딸깍으로.</AppText>
+      <AppText variant="screenTitle" accessibilityRole="header">오늘도, 필요한 정보를{'\n'}딸깍</AppText>
 
       <Pressable
         onPress={() => router.push('/search')}
         accessibilityRole="search"
-        accessibilityLabel="검색어를 입력하세요"
+        accessibilityLabel="검색"
         style={[styles.searchPill, { backgroundColor: c.surface, borderColor: c.border }]}>
         <Ionicons name="search-outline" size={18} color={c.textTertiary} />
-        <AppText variant="secondary" tone="tertiary">검색어를 입력하세요</AppText>
+        <AppText variant="secondary" tone="tertiary">무엇을 찾을까요?</AppText>
       </Pressable>
 
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing.sm, paddingVertical: spacing.xxs }}>
@@ -102,20 +102,32 @@ export default function HomeScreen() {
 
       {error ? <InlineMessage tone="error" message="목록을 불러오지 못했어요. 잠시 후 다시 시도해 주세요." /> : null}
 
+      {data?.pendingCount ? (
+        <Pressable
+          onPress={() => router.push({ pathname: '/library', params: { status: 'pending' } })}
+          accessibilityRole="button"
+          accessibilityHint="임시 저장한 항목 목록을 열어요"
+          style={[styles.banner, { backgroundColor: c.accentSoft }]}>
+          <Ionicons name="time" size={20} color={c.accentText} />
+          <AppText variant="label" style={{ flex: 1, color: c.accentText }}>임시 저장 {data.pendingCount >= 100 ? '99+' : data.pendingCount}개 · 이어서 저장하기</AppText>
+          <Ionicons name="chevron-forward" size={18} color={c.accentText} />
+        </Pressable>
+      ) : null}
+
       {reviewCount ? (
         <Pressable
           onPress={() => router.push({ pathname: '/library', params: { filter: 'review' } })}
           accessibilityRole="button"
           style={[styles.banner, { backgroundColor: c.warningSoft }]}>
           <Ionicons name="alert-circle" size={20} color={c.warning} />
-          <AppText variant="label" style={{ flex: 1, color: c.warning }}>확인이 필요한 항목이 {reviewCount}개 있어요</AppText>
+          <AppText variant="label" style={{ flex: 1, color: c.warning }}>확인할 값이 남은 항목 {reviewCount}개</AppText>
           <Ionicons name="chevron-forward" size={18} color={c.warning} />
         </Pressable>
       ) : null}
 
       {due.length ? (
         <View style={{ gap: spacing.xs }}>
-          <SectionHeader title="다가오는 기한" subtitle="확인한 날짜 · 2주 이내" />
+          <SectionHeader title="다가오는 기한" subtitle="2주 이내" />
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing.sm, paddingBottom: spacing.xs }}>
             {due.map((item) => (
               <DueCard key={item.id} item={item} date={dates.get(item.id)!} thumbnail={thumbs.get(item.id)} onPress={() => openItem(item.id)} />
@@ -124,10 +136,10 @@ export default function HomeScreen() {
         </View>
       ) : null}
 
-      {ready && data && !items.length ? (
+      {ready && data && !items.length && !data.pendingCount ? (
         <EmptyState
-          title="아직 저장한 정보가 없어요"
-          message="카카오톡·브라우저·갤러리의 공유 메뉴에서 '딸깍'을 고르거나(목록에 없으면 '더보기'), 링크·텍스트를 직접 추가해 보세요."
+          title="아직 저장한 게 없어요"
+          message="다른 앱에서 공유 → ‘딸깍’을 눌러 보세요. 목록에 없으면 ‘더보기’ 안에 있어요."
           actionLabel="직접 추가하기"
           onAction={() => router.push('/capture')}
         />
@@ -142,8 +154,8 @@ export default function HomeScreen() {
         </View>
       ) : null}
 
-      {items.length ? <PrimaryButton icon="add" label="새 정보 추가하기" onPress={() => router.push('/capture')} /> : null}
-      <AppText variant="caption" tone="tertiary" align="center">모든 정보는 이 기기 안에만 저장돼요.</AppText>
+      {items.length ? <PrimaryButton icon="add" label="추가하기" onPress={() => router.push('/capture')} /> : null}
+      <AppText variant="caption" tone="tertiary" align="center">이 기기에만 저장돼요</AppText>
     </ScreenScroll>
   );
 }

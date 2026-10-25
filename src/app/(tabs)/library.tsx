@@ -11,21 +11,25 @@ import { firstImages, listItems, upcomingDates } from '@/features/items/item-rep
 import { useLoader } from '@/hooks/use-loader';
 import { toYmd } from '@/utils/dates';
 
-type StatusTab = 'active' | 'completed' | 'archived';
+type StatusTab = 'active' | 'pending' | 'completed' | 'archived';
+const STATUS_TABS: StatusTab[] = ['active', 'pending', 'completed', 'archived'];
 
 /** 보관함: every saved item, filtered by category chip, status tab and "검토 필요". */
 export default function LibraryScreen() {
   const router = useRouter();
   const c = useColors();
-  const params = useLocalSearchParams<{ category?: string; filter?: string }>();
+  const params = useLocalSearchParams<{ category?: string; filter?: string; status?: string }>();
   const paramCategory = params.category && (CATEGORIES as readonly string[]).includes(params.category) ? (params.category as Category) : null;
+  const paramStatus = STATUS_TABS.includes(params.status as StatusTab) ? (params.status as StatusTab) : 'active';
 
   // Navigation params (from home) override the local choice until the user picks something here.
   const [picked, setPicked] = useState<{ category: Category | null; review: boolean; from: string } | null>(null);
-  const paramKey = `${params.category ?? ''}|${params.filter ?? ''}`;
+  const [pickedStatus, setPickedStatus] = useState<{ status: StatusTab; from: string } | null>(null);
+  const paramKey = `${params.category ?? ''}|${params.filter ?? ''}|${params.status ?? ''}`;
   const category = picked && picked.from === paramKey ? picked.category : paramCategory;
   const reviewOnly = picked && picked.from === paramKey ? picked.review : params.filter === 'review';
-  const [status, setStatus] = useState<StatusTab>('active');
+  const status = pickedStatus && pickedStatus.from === paramKey ? pickedStatus.status : paramStatus;
+  const setStatus = (next: StatusTab) => setPickedStatus({ status: next, from: paramKey });
 
   const { data } = useLoader(async () => {
     const items = await listItems({ statuses: [status as ItemStatus], category, needsReview: reviewOnly ? true : undefined });
@@ -58,6 +62,7 @@ export default function LibraryScreen() {
         onChange={setStatus}
         tabs={[
           { id: 'active', label: '진행 중' },
+          { id: 'pending', label: '임시 저장' },
           { id: 'completed', label: '완료' },
           { id: 'archived', label: '보관됨' },
         ]}
@@ -66,8 +71,14 @@ export default function LibraryScreen() {
       {data && !data.items.length ? (
         <EmptyState
           icon="folder-open-outline"
-          title="이 조건의 항목이 없어요"
-          message={status === 'active' ? '공유하거나 직접 추가한 정보가 여기에 모여요.' : '항목 상세에서 완료하거나 보관하면 여기로 옮겨져요.'}
+          title="아직 비어 있어요"
+          message={
+            status === 'active'
+              ? '공유하거나 직접 추가한 정보가 여기에 모여요.'
+              : status === 'pending'
+                ? '‘임시 저장’한 항목이 여기에 모여요.'
+                : '상세에서 완료하거나 보관하면 여기로 와요.'
+          }
         />
       ) : null}
 

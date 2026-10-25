@@ -27,7 +27,7 @@
 - **resolved payload를 쓰지 않는 이유**: 문서상 URL 해석에 네트워크가 필요할 수 있음 → "웹페이지 자동 조회 금지" 원칙 위배.
 - **위험**: API가 `@experimental`. iOS는 App Group(`group.app.ddalggak.mobile`) 등록·서명이 필요하고 실기기 미검증. → `SHARE_RECEIVING_POC.md`.
 
-## D-004 · OCR 엔진은 POC 전까지 "사용 불가" provider로 출시 (2026-10-24)
+## D-004 · OCR 엔진은 POC 전까지 "사용 불가" provider로 출시 (2026-10-24) — Android는 D-015로 대체
 - **결정**: `OcrProvider` 계약 + `unavailableOcrProvider`(가짜 텍스트를 만들지 않음). 이미지 캡처 시 "이 버전에서는 아직 OCR을 지원하지 않아요" 안내 후 수동 입력.
 - **이유**: iOS Vision / Android ML Kit(한국어) 연결은 네이티브 모듈 선택·라이선스·앱 용량 검증이 먼저. 검증 없이 서드파티 네이티브 패키지를 추가하지 않음.
 - **다음 단계**: `OCR_AND_EXTRACTION.md`의 POC 계획 수행 후 `setOcrProvider()`로 교체.
@@ -55,7 +55,7 @@
 - **결정**: 제목·메모·공유 원문·OCR 원문·URL·태그·추출 값에 대해 파라미터 바인딩된 `LIKE ... ESCAPE` 검색, 최대 5개 단어 AND.
 - **대안**: SQLite FTS5 — 한국어 토크나이저(형태소/ngram) 결정이 필요해 Phase 5로 미룸.
 
-## D-010 · 내보내기 형식 v1 (2026-10-24)
+## D-010 · 내보내기 형식 v1 (2026-10-24) — v2로 확장(D-018)
 - `ddalggak-export` JSON, `schemaVersion: 1`, `attachmentsIncluded: false`. 가져오기는 단일 트랜잭션, 기존 id는 건너뜀, 알림은 비활성 상태로 복원.
 
 ## D-011 · 저장소 라이선스 미지정 (2026-10-24)
@@ -69,6 +69,33 @@
 ## D-014 · 테스트용 APK는 로컬 Gradle release 빌드 (2026-10-24)
 - `npx expo prebuild --platform android --clean` 후 `android/gradlew assembleRelease` (JDK 17 지정). Expo 템플릿 기본값대로 **디버그 키로 서명** — 사내 테스트용이며 스토어 배포용이 아님. 스토어용은 업로드 키 생성 후 EAS/서명 설정 필요.
 - 이 PC의 `JAVA_HOME`이 JDK 1.8을 가리키므로 빌드 시 `C:\Program Files\Microsoft\jdk-17.0.20.101-hotspot`을 지정해야 함.
+
+## D-015 · OCR = Android ML Kit 한국어 번들 모델, 로컬 Expo 모듈 (2026-10-25)
+- **결정**: `modules/ddalggak-ocr`(Expo Modules API, Kotlin, Android 전용)에서 `com.google.mlkit:text-recognition-korean:16.0.1`(번들 모델, 라틴 문자도 인식)을 호출. 이미지는 2의 거듭제곱 샘플링으로 긴 변 3072px 이하 디코딩 + EXIF 회전 반영. PDF는 Android 내장 `PdfRenderer`로 앞 3쪽을 렌더링해 같은 엔진으로 인식(추가 라이브러리 없음, 텍스트 PDF·스캔 PDF 모두 같은 경로). JS는 `OcrProvider` 계약(`mlkit-provider.ts`)으로만 사용하고, 모듈이 없는 빌드(iOS·웹·Expo Go·이전 APK)에서는 `unavailable`.
+- **이유**: Google 문서(2026-10-21 갱신본 확인) 기준 번들 모델은 첫 실행부터 오프라인 동작, 크기 증가 "약 4MB/스크립트/아키텍처". Play 서비스(비번들) 방식은 첫 사용 전 모델 다운로드가 필요해 로컬 우선 원칙과 맞지 않음. 서드파티 RN 패키지는 RN 0.88(New Architecture) 호환을 확인할 수 없어 쓰지 않음. minSdk 요구(23)는 Expo 기본 24로 충족.
+- **위험·미확인**: ① Kotlin 코드는 이 PC에서 **컴파일하지 못함**(EAS/development build 필요). ② ML Kit는 진단 정보를 Google에 보낼 수 있음(PRIVACY.md) → 설정에서 끌 수 있게 함, 기본값(켜짐)은 소유자 확인 필요. ③ 정확도 실측 없음. ④ iOS(Vision)는 빌드·검증 수단이 없어 구현하지 않음 — iOS 빌드를 깨뜨릴 수 있는 미검증 Swift 코드를 넣지 않기 위해 `expo-module.config.json`의 platforms를 android로 제한.
+- **대안**: Tesseract(kor.traineddata) — RN 연결·용량·정확도 부담. iOS Vision — iOS 빌드 환경 확보 후.
+
+## D-016 · 임시 저장은 새 상태 `pending` (2026-10-25)
+- **결정**: `ItemStatus`에 `pending`(라벨 "임시 저장") 추가. 전이: `draft → pending`, `pending → active`. `pending`은 알림을 가질 수 없음(`checkReminder`의 `itemActive`). 저장 흐름: 파일 복사·헤더 검증 → (원본을 보관하면 OCR 생략, 보관하지 않으면 지금 OCR) → 규칙 추출(후보만) → `pending` 삽입. 같은 내용을 저장 중일 때의 두 번째 요청은 거절(지문 기반 in-flight 잠금 + 버튼 `useRef` 잠금). DB 삽입 실패 시 복사한 폴더 삭제.
+- **이유**: 기존 `draft`는 "검토 화면이 열린 상태"이고 하루 지나면 자동 삭제되므로 재사용하면 데이터 손실. `needs_review`는 "저장했지만 미확인 값이 있음"이라 의미가 다름. `status`는 CHECK 제약 없는 TEXT라 스키마 변경 불필요.
+- **위험**: 이 버전 이후의 백업(`pending` 포함)을 이전 버전 앱이 가져오면 상태 검증에서 거부됨(백업 v2라 어차피 이전 앱은 거부).
+
+## D-017 · 알림을 날짜 필드에 연결 (마이그레이션 v2, 2026-10-25)
+- **결정**: `reminders`에 `source_field_id`, `target_date`, `days_before` 추가(기존 행은 NULL). 날짜 수정·확인 해제는 `item-service.editField`를 거쳐 `syncRemindersForField`가 처리: 바뀐 날짜로 취소 후 재예약, 확인 해제·과거·잘못된 날짜면 끔. 날짜를 "다음 날" 등으로 임의 보정하지 않음. 값 삭제 시 알림은 남기고 연결만 해제(사용자가 만든 알림이므로).
+- **상태 표시**: DB 행(사용자 의도)과 OS 예약 상태를 구분해 `deliveryState`로 표시 — 예약됨 / 기기 예약 확인 안 됨 / 권한 꺼짐 / 실행 환경 미지원 / 예약 실패 / 꺼짐 / 지남. 권한 허용 후 OS 예약이 실패하면 "예약 실패"로 표시하고 "다시 예약" 제공.
+- **복원**: 보관·완료 → 진행 중으로 되돌려도 자동 재예약하지 않음(D-008 유지). 대신 알림별 "다시 켜기"가 활성 항목·확인된 날짜·미래 시각·60개 한도를 다시 검사한 뒤 예약.
+- **재조정**: 앱 시작과 알림 탭 진입 시 `reconcileNotifications` — 비활성 항목의 알림 끔, 사라진 OS 예약 재등록, 행 없는 OS 예약 취소. 멱등.
+- **시간대**: 저장값은 오프셋 없는 로컬 벽시계(D-007). 예약은 예약 시점 기기 시간대 기준의 절대 시각이라, 기기 시간대가 바뀌어도 기존 예약은 원래 시간대 기준 그 순간에 울린다. 재조정으로 다시 예약되는 경우에만 현재 시간대로 해석된다(실기기 미검증).
+
+## D-018 · 백업 v2: 첨부를 JSON에 base64로 포함 (2026-10-25)
+- **결정**: `schemaVersion: 2`. "첨부 없이"(데이터만)와 "첨부 포함"(파일별 base64 + SHA-256 + 크기, 총 30MB 예산, 파일당 25MB) 중 선택. 예산을 넘거나 파일이 없으면 `data: null` + `excludedReason`으로 목록에 남겨 복원 시 "백업에 없음"을 알림. v1 파일 가져오기 계속 지원.
+- **가져오기**: 전체 검증(경로 안전 id, MIME 허용 목록, base64 형식·디코딩 크기) → 새 항목의 첨부 파일 쓰기 → SHA-256·헤더 MIME 재검증 → 단일 트랜잭션. 어느 단계든 실패하면 이번에 쓴 폴더를 지우고 아무것도 반영하지 않음. 이미 있는 항목 id는 건너뜀(덮어쓰기·병합 없음). 필드·알림·첨부 id는 새로 발급(기본키 충돌 방지), 알림→필드 연결은 새 id로 이어 줌. 알림은 꺼진 채 복원.
+- **이유**: zip은 추가 네이티브/JS 라이브러리가 필요하고 앱 용량·호환성 검토가 필요. 단일 JSON은 기존 형식·검증 코드를 그대로 확장 가능. 가져오기는 JSON 전체를 메모리에 올리므로 예산을 30MB(파일 최대 48MB)로 제한.
+- **후속**: 큰 백업용 스트리밍 형식(JSONL 또는 zip), 백업 암호화(비밀번호 기반).
+
+## D-019 · OCR 설정 `ocrEnabled` (2026-10-25)
+- 설정 > 저장 방식 > "이미지·PDF 글자 인식". 끄면 캡처·재분석 모두 OCR을 호출하지 않고 "설정에서 꺼 두었어요" 안내. 기본값 켜짐(D-015 위험 ② 참고).
 
 ## D-012 · 웹 타깃은 UI 확인용 (2026-10-24)
 - `expo start --web`은 레이아웃·흐름 점검용. 공유 수신/알림/파일 복사는 웹에서 동작하지 않음(`.web.ts` 대체 구현). 출시 대상 아님.

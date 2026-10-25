@@ -6,8 +6,12 @@
 export const CATEGORIES = ['place', 'shopping', 'receipt', 'coupon', 'reservation', 'event', 'ticket', 'warranty', 'document', 'link', 'other'] as const;
 export type Category = (typeof CATEGORIES)[number];
 
-/** draft = captured but not reviewed yet. Deletion is a hard delete (rows + files + notifications). */
-export type ItemStatus = 'draft' | 'active' | 'completed' | 'archived';
+/**
+ * draft = captured, review screen open (abandoned drafts are removed after a day).
+ * pending = "임시 저장": the user chose to sort it out later; kept until reviewed or deleted.
+ * Deletion is a hard delete (rows + files + notifications).
+ */
+export type ItemStatus = 'draft' | 'pending' | 'active' | 'completed' | 'archived';
 
 export type SourceType = 'shared-url' | 'shared-text' | 'shared-image' | 'shared-document' | 'manual' | 'paste';
 
@@ -91,7 +95,13 @@ export interface Reminder {
   scheduledAt: string;
   timezoneId: string;
   reminderType: ReminderType;
+  /** OS notification id. null = not scheduled on the device (no permission, failure, or switched off). */
   notificationId: string | null;
+  /** Confirmed date field this reminder was made from (null: typed date, or created before v2). */
+  sourceFieldId: string | null;
+  /** The date the user picked (`YYYY-MM-DD[THH:mm]`) and the offset; used to reschedule. */
+  targetDate: string | null;
+  daysBefore: number | null;
   enabled: boolean;
   completedAt: string | null;
   createdAt: string;
@@ -129,6 +139,8 @@ export interface AppSettings {
   retainAttachments: boolean;
   /** Store full OCR text (searchable) or only the extracted fields. */
   storeOcrText: boolean;
+  /** Run on-device text recognition on images/PDFs (Android ML Kit; see docs/PRIVACY.md). */
+  ocrEnabled: boolean;
   /** Default reminder hour for date-only values (0–23). */
   defaultReminderHour: number;
   onboardingSeenAt: string | null;
@@ -137,6 +149,7 @@ export interface AppSettings {
 export const DEFAULT_SETTINGS: AppSettings = {
   retainAttachments: true,
   storeOcrText: true,
+  ocrEnabled: true,
   defaultReminderHour: 9,
   onboardingSeenAt: null,
 };
