@@ -230,3 +230,7 @@ docs/                아키텍처·결정·POC·개인정보·위협 모델·라
 - iOS: 미연결·미검증. 정확도 실측 없음.
 
 **남은 결정·후속**: OCR 기본값(ML Kit 진단 전송 관련) 소유자 결정 → EAS 빌드로 컴파일·실기기 QA(`docs/TESTING.md` 체크리스트) → 백업 암호화·대용량 백업 형식 → iOS Vision.
+
+**새 빌드 설치 (2026-10-25)**: EAS preview 빌드 90f9af88(커밋 6f97a5f) 성공 — 네이티브 OCR 모듈 컴파일 통과. APK: https://expo.dev/artifacts/eas/cvecdG1zyKH8wRNYJkfHn6XxONZZfYzD2ik_WokzXP4.apk. Galaxy Z Flip5에 `adb install -r`로 업데이트 설치 → 실행·크래시 없음, 기존 항목 유지(마이그레이션 v2), 새 문구 표시, 마이 탭 "글자 인식 사용 가능" 확인. 실제 이미지 OCR·임시 저장·알림 재예약·백업 복원은 아직 기기에서 시험하지 않음(`docs/TESTING.md`).
+
+**실기기 OCR 시험 (2026-10-25)**: 직접 만든 가상 쿠폰 이미지 1장으로 Galaxy Z Flip5에서 시험 — 제목·분류(쿠폰)·만료일 2026.12.31·결제 금액 4,500원·쿠폰번호를 정확히 읽었고 모두 "확인 권장"(자동 확정 없음), 이미지 속 인증번호는 후보에서 제외됨, 크래시 없음. 선명한 합성 이미지 1장이라 정확도 측정은 아님(`docs/TESTING.md`).
