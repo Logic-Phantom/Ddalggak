@@ -7,8 +7,8 @@
 
 | | 항목 | 내용 |
 |---|---|---|
-| ✅ | 앱 이름 | "딸깍" 유지 결정(2026-10-26). 같은 카테고리에 「딸깍 - 링크, 스크린샷, 메모 한 곳에 저장」(TEAM FOR:e)이 있어 스토어 표시명은 `딸깍 - 링크·쿠폰·예약 정보함`으로 구분. 위험·완화는 `BRAND_AND_TRADEMARKS.md` |
-| ⬜ | 상표 검색 | KIPRIS 9류·42류 "딸깍"/새 이름 직접 검색 (자동 조회 실패) |
+| ✅ | 앱 이름 | **KeepOn(킵온)** — 2026-10-26 "딸깍"에서 변경(같은 카테고리 동명 앱 충돌). 스토어 표시명 `KeepOn 킵온 - 링크·쿠폰·예약 정보함`, 기기 표시 이름 `KeepOn`. Play 조사 결과는 `BRAND_AND_TRADEMARKS.md` |
+| ⬜ | 상표 검색 | KIPRIS 9류·42류 "KeepOn", "킵온", "Keep On" 직접 검색 (자동 조회 실패) |
 | ✅ | 지원 이메일 | `dlacoaud96@gmail.com` — `app.json` `extra.supportEmail`, 마이 > 문의하기, 처리방침 9항 |
 | ✅ | 처리방침 게시 | https://logic-phantom.github.io/Ddalggak/privacy-policy.html (`gh-pages` 브랜치, 원본 `store/site/`). `app.json` `extra.privacyPolicyUrl` 설정 → 앱 처리방침 화면에 "웹에서 전체 처리방침 보기" 표시 |
 | ✅ | 휴대전화 스크린샷 | `store/screenshots/` 7장, 1080×2160 (웹 미리보기, 가상 데이터). 실기기 화면으로 바꾸면 더 정확 |
@@ -64,7 +64,7 @@ npx eas-cli@latest submit --platform android --profile production
 | ⬜ | 알림 예약 → 앱 강제 종료 → 알림 탭 | 앱이 열리고 해당 항목 상세로 이동 |
 | ⬜ | 앱 실행 중 알림 탭 | 해당 항목 상세로 이동 (한 번만) |
 | ⬜ | 마이 > 개인정보 처리방침 / 오픈소스 라이선스 | 내용 표시, 항목 펼치기 |
-| ⬜ | 마이 하단 버전 | `딸깍 1.0.0` |
+| ⬜ | 마이 하단 버전·이름 | `KeepOn 1.0.0`, 홈 화면·공유 메뉴에 `KeepOn` 표시 |
 | ⬜ | 알림 권한 거부 후 알림 만들기 | "알림 탭에서 일정을 확인할 수 있어요" 문구 |
 | ⬜ | 사진 선택 (Android 13+ / 12 이하) | 권한 팝업 없이 시스템 선택기 |
 | ⬜ | 공유 수신: Chrome 링크, 카카오톡 텍스트, 갤러리 이미지, 파일 앱 PDF | `SHARE_RECEIVING_POC.md` 표 갱신 |

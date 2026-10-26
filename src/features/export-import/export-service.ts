@@ -34,7 +34,7 @@ export async function exportToShareSheet(): Promise<number> {
   const uri = writeCacheText(`ddalggak-export-${toYmd(new Date())}.json`, JSON.stringify(archive, null, 1));
   if (process.env.EXPO_OS !== 'web') {
     if (!(await Sharing.isAvailableAsync())) throw new AppError('unknown', '이 기기에서는 공유 시트를 열 수 없어요.');
-    await Sharing.shareAsync(uri, { mimeType: 'application/json', dialogTitle: '딸깍 데이터 내보내기' });
+    await Sharing.shareAsync(uri, { mimeType: 'application/json', dialogTitle: 'KeepOn 데이터 내보내기' });
   }
   return archive.items.length;
 }

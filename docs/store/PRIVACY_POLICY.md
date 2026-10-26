@@ -1,11 +1,11 @@
-# 딸깍 개인정보 처리방침
+# KeepOn(킵온) 개인정보 처리방침
 
 > 게시용 원본. 같은 내용을 `site/privacy-policy.html`(GitHub Pages 게시본)로 변환해 두었다. 앱 안의 화면(`src/app/privacy.tsx`)과 내용·시행일을 함께 고친다.
 > 법률 자문이 아니므로 필요하면 전문가 검토를 받는다.
 
 시행일: 2026년 10월 26일
 
-임채명(이하 "개발자")은 Android 앱 「딸깍」(이하 "앱")을 이용하는 분의 개인정보를 소중히 다루며, 「개인정보 보호법」 등 관련 법령을 지킵니다. 이 처리방침은 앱이 어떤 정보를 어떻게 다루는지 설명합니다.
+임채명(이하 "개발자")은 Android 앱 「KeepOn(킵온)」(이하 "앱")을 이용하는 분의 개인정보를 소중히 다루며, 「개인정보 보호법」 등 관련 법령을 지킵니다. 이 처리방침은 앱이 어떤 정보를 어떻게 다루는지 설명합니다.
 
 ## 1. 개발자가 수집하는 개인정보
 
@@ -93,4 +93,4 @@
 
 Effective: October 26, 2026
 
-Ddalggak does not collect, transmit or share any personal data. There is no account, no server, and no analytics, advertising or crash-reporting SDK, and the advertising ID is not used. Content you share into the app or add yourself (links, text, images, PDFs) and the dates, amounts and codes found in it are stored only on your device, unencrypted, protected by the operating system's app sandbox, until you delete them or uninstall the app. If Android device backup is on, app data may be included in your own Google account backup, which the developer cannot access. Links open in your browser only when you tap them; exports go only to the app you choose. Permissions: notifications (requested when you create your first reminder), run at startup (restore scheduled reminders), vibration. Photos are read only through the system photo picker. Contact: dlacoaud96@gmail.com.
+KeepOn does not collect, transmit or share any personal data. There is no account, no server, and no analytics, advertising or crash-reporting SDK, and the advertising ID is not used. Content you share into the app or add yourself (links, text, images, PDFs) and the dates, amounts and codes found in it are stored only on your device, unencrypted, protected by the operating system's app sandbox, until you delete them or uninstall the app. If Android device backup is on, app data may be included in your own Google account backup, which the developer cannot access. Links open in your browser only when you tap them; exports go only to the app you choose. Permissions: notifications (requested when you create your first reminder), run at startup (restore scheduled reminders), vibration. Photos are read only through the system photo picker. Contact: dlacoaud96@gmail.com.

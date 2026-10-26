@@ -9,7 +9,7 @@
 - 타이포: Pretendard 4종. screenTitle, title, sectionTitle, body, bodyStrong, secondary, label, meta, caption, numeric.
 
 ## 화면 구조
-| 레퍼런스 화면 | 딸깍 구현 |
+| 레퍼런스 화면 | KeepOn 구현 |
 |---|---|
 | 스플래시/온보딩 | `app/onboarding.tsx` — 로고(현재 앱 아이콘), 이름, 슬로건, 세 가지 약속, 시작하기. 공유로 처음 열린 경우엔 막지 않음 |
 | 홈 | `(tabs)/index.tsx` — 인사말 제목, 검색 pill, 원형 카테고리 아이콘 줄, 검토 필요 배너, 다가오는 기한 카드(이미지/카테고리 아이콘), 최근 저장 |

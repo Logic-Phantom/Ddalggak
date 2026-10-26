@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "딸깍",
+    "name": "KeepOn",
     "slug": "ddalggak",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -40,8 +40,8 @@
     "web": {
       "output": "single",
       "favicon": "./assets/images/favicon.png",
-      "name": "딸깍",
-      "shortName": "딸깍",
+      "name": "KeepOn",
+      "shortName": "KeepOn",
       "themeColor": "#2F5BD3",
       "backgroundColor": "#F6F7F9"
     },

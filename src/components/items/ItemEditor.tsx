@@ -38,7 +38,7 @@ import { ExtractedFieldRow } from './ExtractedFieldRow';
 const MANUAL_TYPES: { type: FieldType; label: string; placeholder: string }[] = [
   { type: 'date', label: '날짜', placeholder: '2026-10-31 또는 2026-10-31 18:00' },
   { type: 'amount', label: '금액(원)', placeholder: '12,000' },
-  { type: 'merchant', label: '상호·장소명', placeholder: '딸깍커피' },
+  { type: 'merchant', label: '상호·장소명', placeholder: '킵온커피' },
   { type: 'address', label: '주소', placeholder: '서울 마포구 양화로 12' },
   { type: 'coupon-code', label: '쿠폰 코드', placeholder: 'ABCD-1234' },
 ];

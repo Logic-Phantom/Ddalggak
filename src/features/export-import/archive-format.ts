@@ -38,7 +38,7 @@ export function validateArchive(data: unknown): string[] {
   const errors: string[] = [];
   if (typeof data !== 'object' || data === null) return ['JSON 객체가 아니에요.'];
   const a = data as Record<string, unknown>;
-  if (a.format !== ARCHIVE_FORMAT) errors.push('딸깍 내보내기 파일이 아니에요.');
+  if (a.format !== ARCHIVE_FORMAT) errors.push('KeepOn 내보내기 파일이 아니에요.');
   if (a.schemaVersion !== ARCHIVE_SCHEMA_VERSION) errors.push(`지원하지 않는 버전이에요 (${String(a.schemaVersion)}).`);
   if (!Array.isArray(a.items)) return [...errors, '항목 목록이 없어요.'];
   if (a.items.length > MAX_IMPORT_ITEMS) errors.push(`항목이 너무 많아요 (최대 ${MAX_IMPORT_ITEMS}개).`);

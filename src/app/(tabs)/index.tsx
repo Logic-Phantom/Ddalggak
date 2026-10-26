@@ -82,7 +82,7 @@ export default function HomeScreen() {
         </Pressable>
       </View>
 
-      <AppText variant="screenTitle" accessibilityRole="header">오늘도, 필요한 정보를{'\n'}딸깍으로.</AppText>
+      <AppText variant="screenTitle" accessibilityRole="header">필요한 정보,{'\n'}놓치지 않게 KeepOn.</AppText>
 
       <Pressable
         onPress={() => router.push('/search')}
@@ -127,7 +127,7 @@ export default function HomeScreen() {
       {ready && data && !items.length ? (
         <EmptyState
           title="아직 저장한 정보가 없어요"
-          message="카카오톡·브라우저·갤러리의 공유 메뉴에서 '딸깍'을 고르거나(목록에 없으면 '더보기'), 링크·텍스트를 직접 추가해 보세요."
+          message="카카오톡·브라우저·갤러리의 공유 메뉴에서 'KeepOn'을 고르거나(목록에 없으면 '더보기'), 링크·텍스트를 직접 추가해 보세요."
           actionLabel="직접 추가하기"
           onAction={() => router.push('/capture')}
         />

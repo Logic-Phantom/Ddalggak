@@ -9,17 +9,17 @@
 - **위험**: 이 문서 작성 시점에 Expo 공식 "최신 안정" 버전을 웹에서 재확인하지는 않았음 → 출시 전 확인 필요.
 
 ## D-002 · CutPick에서 가져온 것 (2026-10-24)
-| 가져온 것 | 딸깍에서의 변경 |
+| 가져온 것 | KeepOn에서의 변경 |
 |---|---|
 | eslint/metro/tsconfig/jest 설정, `AGENTS.md` | 경로 alias(`@/*`) 동일, jest testMatch에 share-intent·fixture 폴더 추가 |
 | SQLite `PRAGMA user_version` 마이그레이션 패턴 | 마이그레이션을 **트랜잭션**으로 감싸 반쯤 적용되는 상태 방지 |
 | 앱 전용 파일 저장소(`expo-file-system` 신규 `File`/`Directory` API) + `.web.ts` 대체 구현 | 공유/선택 파일을 항목별 폴더로 **복사**(임시 URI 수명 대응) |
-| `AppError` + 민감정보 없는 `logError` | 딸깍 오류 코드(공유·OCR·알림·가져오기) |
+| `AppError` + 민감정보 없는 `logError` | KeepOn 오류 코드(공유·OCR·알림·가져오기) |
 | 디자인 시스템 구조(AppText, Buttons, Feedback, Layout, FilterChip, Tag…) | "Calm Personal Inbox" 토큰으로 교체, TextField·ConfidenceBadge·StatusBadge 신규 |
 | Pretendard 폰트(OFL 1.1) | 그대로 사용 (브랜드 전용 영문 폰트는 제외) |
 | NativeTabs(+웹 JS 탭) 구조 | 인박스/검색/기한/설정 4탭 |
 | `generate-oss-licenses.mjs`, `android-device.ps1` | `scripts/license-audit.mjs`, 기기 QA 스크립트로 이름·출력 경로 변경 |
-- **가져오지 않은 것**: Supabase/커뮤니티/로그인(딸깍 MVP는 서버 없음), 이미지 분석·추천 엔진, EAS projectId/owner(CutPick 계정 값이므로 복사 금지).
+- **가져오지 않은 것**: Supabase/커뮤니티/로그인(KeepOn MVP는 서버 없음), 이미지 분석·추천 엔진, EAS projectId/owner(CutPick 계정 값이므로 복사 금지).
 
 ## D-003 · 공유 수신은 `expo-sharing`의 실험적 incoming share 사용 (2026-10-24)
 - **결정**: `expo-sharing@58.0.20` config plugin(`ios.enabled`, `android.enabled`) + `useIncomingShare()`의 **raw payload**만 사용. `+native-intent.ts`에서 `ddalggak://expo-sharing` → `/capture?source=share`로 라우팅.
@@ -91,3 +91,9 @@
 - **결정**: Android 자동 백업을 끄지 않는다.
 - **이유**: 서버·동기화가 없어 기기 교체 시 사용자가 데이터를 되살릴 유일한 자동 경로. 복원 후 알림은 `reconcileNotifications`가 다시 예약한다.
 - **위험**: 암호화되지 않은 DB가 사용자 Google 계정 백업에 포함될 수 있음 → 처리방침 3항에 고지. 민감도 우려가 커지면 `android.allowBackup: false` 또는 백업 제외 규칙을 검토.
+
+## D-019 · 앱 이름 "딸깍" → KeepOn(킵온) (2026-10-26)
+- **결정**: 사용자에게 보이는 이름을 KeepOn으로 바꾼다(`app.json` `name`, `BRAND_NAME`, 안내 문구, 스토어·처리방침·사이트). 스토어 표시명은 `KeepOn 킵온 - 링크·쿠폰·예약 정보함`, 기기 표시 이름은 `KeepOn`.
+- **이유**: Google Play 생산성 카테고리에 같은 개념의 「딸깍 - 링크, 스크린샷, 메모 한 곳에 저장」(1만+)이 있어 혼동·상표 위험이 큼. "킵온"은 일치 앱 없음, "KeepOn"은 다른 분야 앱 1개.
+- **바꾸지 않은 것**: 패키지 `app.ddalggak.mobile`, 스킴 `ddalggak`, EAS slug/projectId, DB·파일 폴더·내보내기 형식 이름, 로그 접두사, 저장소·Pages 주소. 사용자에게 보이지 않고, 바꾸면 설치본·데이터·EAS 연결이 끊긴다.
+- **안내 문구**: 공유 메뉴에는 기기 표시 이름이 뜨므로 "‘KeepOn’을 고르세요"로 맞춘다.

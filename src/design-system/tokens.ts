@@ -1,5 +1,5 @@
 /**
- * 딸깍 design tokens — "Calm Personal Inbox", deep-green edition (2026-10-24 redesign).
+ * KeepOn design tokens — "Calm Personal Inbox", deep-green edition (2026-10-24 redesign).
  * Near-white mint background, white rounded cards, deep green for primary actions,
  * pastel circles per category. Status always pairs color with an icon and text.
  * Rules: docs/DESIGN_SYSTEM.md. Screens must not define their own colors/spacings.

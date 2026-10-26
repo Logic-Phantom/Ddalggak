@@ -173,7 +173,7 @@ export default function CaptureScreen() {
         <Card>
           <View style={{ gap: spacing.xxs }}>
             <AppText variant="label">다른 앱에서 바로 보내기</AppText>
-            <AppText variant="secondary" tone="secondary">카카오톡·브라우저·사진 앱에서 공유 버튼을 누르고 ‘딸깍’을 고르면 이 화면으로 와요. 앱마다 보내 주는 형식이 달라서 일부는 링크나 텍스트만 전달될 수 있어요.</AppText>
+            <AppText variant="secondary" tone="secondary">카카오톡·브라우저·사진 앱에서 공유 버튼을 누르고 ‘KeepOn’을 고르면 이 화면으로 와요. 앱마다 보내 주는 형식이 달라서 일부는 링크나 텍스트만 전달될 수 있어요.</AppText>
           </View>
         </Card>
         <AppText variant="caption" tone="tertiary">

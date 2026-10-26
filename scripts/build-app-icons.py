@@ -1,4 +1,4 @@
-# Draws the 딸깍 app icon set from simple vector shapes (original artwork, no external assets).
+# Draws the KeepOn app icon set from simple vector shapes (original artwork, no external assets).
 # Usage: python scripts/build-app-icons.py   (needs Pillow: python -m pip install Pillow)
 # Output: assets/images/{icon,android-icon-foreground,android-icon-monochrome,splash-icon,favicon}.png
 #
@@ -32,7 +32,7 @@ def glyph_mask(size: int, scale: float = 1.0) -> Image.Image:
     # Inner shelf with a soft notch, drawn as one joined stroke.
     shelf_y = top + 0.12
     d.line([p(left, shelf_y), p(0.38, shelf_y), p(0.43, shelf_y + 0.07), p(0.57, shelf_y + 0.07), p(0.62, shelf_y), p(right, shelf_y)], fill=255, width=w, joint='curve')
-    # The "딸깍" dot dropping into the tray.
+    # The "tap" dot dropping into the tray.
     r = 0.075
     cx, cy = 0.5, 0.30
     d.ellipse([p(cx - r, cy - r), p(cx + r, cy + r)], fill=255)
@@ -90,8 +90,8 @@ def build_store_assets() -> None:
     tagline = ImageFont.truetype(str(fonts / 'Pretendard-SemiBold.otf'), 44)
     note = ImageFont.truetype(str(fonts / 'Pretendard-Medium.otf'), 30)
     x = 470
-    d.text((x, 92), '딸깍', font=title, fill=(255, 255, 255))
-    d.text((x, 252), '저장한 정보를, 딸깍 한 번에.', font=tagline, fill=(255, 255, 255))
+    d.text((x, 92), 'KeepOn', font=title, fill=(255, 255, 255))
+    d.text((x, 252), '저장한 정보, 놓치지 않게.', font=tagline, fill=(255, 255, 255))
     d.text((x, 330), '공유하면 모이고, 기한은 알림으로', font=note, fill=(214, 225, 255))
     d.text((x, 374), '로그인 없이 기기 안에만 저장', font=note, fill=(214, 225, 255))
     bg.save(store / 'feature-graphic-1024x500.png')

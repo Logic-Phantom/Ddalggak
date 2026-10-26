@@ -129,7 +129,7 @@ await addItem('치과 정기검진 예약\n11월 14일 오전 10시 30분');
 await addItem('https://shop.example.com/products/winter-coat\n겨울 울 코트 89,000원 주문번호 20261024-1187\n배송 완료 후 7일 이내 반품 가능');
 const fest = await addItem('가을 재즈 페스티벌 입장권\n2026년 11월 8일 오후 5시 입장\n티켓번호 T-58213\n서울 마포구 양화로 12');
 const coupon = await addItem('[모바일 쿠폰] 아메리카노 1잔\n쿠폰번호 KCAF-2611-0583\n유효기간 2026.11.05까지');
-const dinner = await addItem('딸깍식당 예약이 확정되었어요.\n일시: 11월 2일 저녁 7시, 4명\n예약번호 R20261102');
+const dinner = await addItem('킵온식당 예약이 확정되었어요.\n일시: 11월 2일 저녁 7시, 4명\n예약번호 R20261102');
 await addReminder(dinner, '하루 전');
 await addReminder(fest, '3일 전');
 await addReminder(coupon, '하루 전');
@@ -142,7 +142,7 @@ await shot('01-home');
 // 02 capture with text typed (category preview)
 await go(`${BASE}/capture`);
 await page.waitForSelector('[data-testid="capture-text"]');
-await page.type('[data-testid="capture-text"]', '[공연 예매 완료] 뮤지컬 〈딸깍〉\n2026년 11월 21일 오후 2시\n예매번호 M4471209\n좌석 R석 12열 8번');
+await page.type('[data-testid="capture-text"]', '[공연 예매 완료] 뮤지컬 〈가을밤〉\n2026년 11월 21일 오후 2시\n예매번호 M4471209\n좌석 R석 12열 8번');
 await sleep(800);
 await shot('02-capture');
 
