@@ -11,26 +11,28 @@
 - 공유된 URL을 앱이 자동으로 조회하거나 스크래핑하지 않음
 - 자동 추출값은 근거·신뢰도와 함께 보여 주고, 확인 전 값으로는 알림을 만들지 않음
 
-## 현재 지원 범위 (2026-10-24)
+## 현재 지원 범위 (2026-10-26, 1.0.0 출시 준비 중)
 
 | 기능 | 상태 |
 |---|---|
-| 텍스트/URL 직접 입력·붙여넣기 | 구현, 웹 프리뷰에서 확인 |
+| 텍스트/URL 직접 입력·붙여넣기 | 구현, Android 실기기(Galaxy Z Flip5) 확인 |
 | 사진/문서(PDF·이미지) 선택 | 구현, 기기 미검증 |
-| 외부 앱 공유 수신 (Android intent / iOS Share Extension) | 설정·코드 구현, **실기기 미검증** ([지원표](docs/SHARE_RECEIVING_POC.md)) |
+| 외부 앱 공유 수신 (Android intent / iOS Share Extension) | Android: 텍스트·링크 공유 실기기 확인, 갤러리 공유 시트 표시 확인, 이미지 파일 복사는 미확정 ([지원표](docs/SHARE_RECEIVING_POC.md)) / iOS 미검증 |
 | 한국어 날짜·시간·금액·코드·주소 규칙 추출 | 구현, 단위/fixture 테스트 통과 |
 | 이미지 OCR | **미연결** — OCR 계약만 있고 "지원하지 않음"을 안내 ([계획](docs/OCR_AND_EXTRACTION.md)) |
 | 분류 후보, 검토·수정·확인 UI | 구현 |
-| 로컬 알림 (확인된 날짜만) | 구현, 기기 알림 전달 미검증 |
+| 로컬 알림 (확인된 날짜만) | 구현, Android 실기기 예약·완료 시 취소 확인. 알림을 눌러 앱 열기(종료 상태) 수정은 실기기 미확인 |
 | 검색·분류·태그·보관·완료·삭제 | 구현 |
 | JSON 내보내기/가져오기, 전체 삭제 | 구현 (첨부 파일은 내보내기에 미포함) |
-| iOS | 빌드 환경 없음(Windows) → 전부 미검증 |
+| 개인정보 처리방침·오픈소스 라이선스 화면 | 구현, 웹 미리보기 확인 (처리방침 웹 게시본: https://logic-phantom.github.io/Ddalggak/privacy-policy.html) |
+| Google Play 출시 | 자료 준비 완료, 비공개 테스트 전 ([체크리스트](docs/RELEASE_CHECKLIST.md)) |
+| iOS | 미검증 (EAS Build + Apple Developer 계정 필요) |
 
 공유 수신 동작은 OS 버전과 보내는 앱(카카오톡 등)에 따라 달라질 수 있으며, 앱이 노출한 공유 데이터만 받을 수 있습니다. 공유가 안 되는 경우에도 앱 안의 붙여넣기·사진 선택·파일 선택은 동작합니다.
 
 ## 요구 사항
 
-- Node.js 20+ (확인 환경: Node 24.20.0, npm 11.19.0)
+- Node.js 20+ (확인 환경: Windows 11 Node 24.20.0 / macOS Node 24.22.0, npm 11.19)
 - Android: Android Studio/SDK (development build), 또는 EAS Build
 - iOS: macOS + Xcode, 또는 EAS Build + Apple Developer 계정
 
@@ -250,3 +252,35 @@ docs/store/          Play 등록정보 원고, 정책 답변, 처리방침, 비�
 - 유지: 패키지 `app.ddalggak.mobile`, 스킴, EAS slug, DB·내보내기 형식 이름, 저장소·Pages 주소.
 - 실행: `npx tsc --noEmit` 통과, `npx expo lint` 통과, `npx jest` 127/127. 위 작업 내역(과거 기록)의 "딸깍" 표기는 그대로 둔다.
 - 미확인: KIPRIS "KeepOn"/"킵온" 상표 검색.
+
+### 2026-10-26 — 작업 정리 (macOS 환경, 브랜치·커밋·게시 기록)
+
+**환경 준비**
+- 빈 폴더 `~/Desktop/eclipse/Ddalggak`에 저장소를 받음(앱이 만든 `.claude/`가 있어 `git clone .` 대신 `git init` → `remote add` → `fetch` → `main` 체크아웃). `npm install` 1287개 설치.
+- `npm install` 경고: install 스크립트 3개(`@parcel/watcher`, `fsevents`, `unrs-resolver`)는 npm 허용 목록 밖이라 실행 안 됨 — 개발 서버·린트는 정상 동작. high 취약점 5건은 빌드 도구(`@expo/cli`) 안의 것.
+- `.claude/launch.json`에 macOS용 `ddalggak-web-mac`(npx) 추가(기존 `ddalggak-web`은 Windows `npx.cmd`).
+- 이 맥에는 git 사용자 설정이 없어 커밋마다 기존 작성자(`Logic-Phantom`)를 지정함. `gh` CLI 없음.
+
+**이름 결정 경과**
+1. Play 조사에서 같은 개념의 「딸깍 - 링크, 스크린샷, 메모 한 곳에 저장」 발견 → 변경 권장.
+2. 한때 "딸깍" 유지로 결정(커밋 `37628ff`) → 후보(담아둠·딱챙김·콕챙 등 10개) Play 검색 → 소유자가 KeepOn(킵온) 제안 → 조사 후 변경(D-019, `fb8c7c5`).
+
+**브랜치·커밋** (`release/1.0.0-prep`, origin에 push, `main` 미병합·PR 없음)
+| 커밋 | 내용 |
+|---|---|
+| `176f9d2` | 출시 준비: 알림 버그 2건, 처리방침·오픈소스 화면, 권한 정리, 버전 1.0.0, 스토어 문서·그래픽 |
+| `82c41e6` | 연락처·처리방침 게시·스크린샷·비공개 테스트 안내, 동명 앱 조사 |
+| `37628ff` | "딸깍" 유지 결정 기록(이후 번복) |
+| `fb8c7c5` | 앱 이름 KeepOn(킵온)으로 변경 |
+
+**게시**: `gh-pages` 브랜치(`docs/store/site/`와 같은 내용) → GitHub Pages 자동 활성화. https://logic-phantom.github.io/Ddalggak/ , https://logic-phantom.github.io/Ddalggak/privacy-policy.html
+
+**알아 둘 점(개발 환경)**
+- `app.json`을 고친 뒤 웹 미리보기에 옛 값이 보이면 Metro 캐시 때문 → `npx expo start --web --clear`. 출시 빌드는 매번 새로 읽으므로 영향 없음.
+- 웹 미리보기에서 전체 새로고침 직후 "데이터를 열지 못했어요"가 가끔 뜨는 것은 브라우저 OPFS의 SQLite 잠금(웹 전용). 다시 시도하면 열림.
+
+**남은 일** (`docs/RELEASE_CHECKLIST.md`)
+- KIPRIS 상표 검색("KeepOn", "킵온", "Keep On", 9류·42류)
+- production AAB 빌드 → 내부 테스트 설치 → 실기기 회귀 테스트(알림 탭 열기, 새 이름 표시 등)
+- 비공개 테스트(테스터 12명 이상·14일, `docs/store/CLOSED_TEST_GUIDE.md`) → 프로덕션 신청
+- `release/1.0.0-prep` → `main` PR·병합
