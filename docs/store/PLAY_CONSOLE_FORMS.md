@@ -8,7 +8,7 @@
 
 | 설문 | 답 |
 |---|---|
-| 개인정보처리방침 | `PRIVACY_POLICY.md`를 게시한 공개 URL (앱 안: 마이 > 개인정보 처리방침) |
+| 개인정보처리방침 | https://logic-phantom.github.io/Ddalggak/privacy-policy.html (앱 안: 마이 > 개인정보 처리방침) |
 | 광고 | 광고 없음 |
 | 앱 액세스 권한 | 모든 기능을 별도 액세스 권한 없이 사용 가능 (로그인 없음) |
 | 콘텐츠 등급 | IARC 설문 → 예상 등급: 전체이용가 / Everyone / PEGI 3 |

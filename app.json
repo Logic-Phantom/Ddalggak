@@ -107,8 +107,8 @@
       "reactCompiler": true
     },
     "extra": {
-      "privacyPolicyUrl": "",
-      "supportEmail": "",
+      "privacyPolicyUrl": "https://logic-phantom.github.io/Ddalggak/privacy-policy.html",
+      "supportEmail": "dlacoaud96@gmail.com",
       "router": {
         "asyncRoutes": {
           "web": true

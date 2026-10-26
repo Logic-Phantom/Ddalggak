@@ -1,23 +1,29 @@
 # 출시 체크리스트 — Google Play 1.0.0
 
 > 2026-10-26 점검. ✅ 완료·확인 · 🛠 이번에 수정 · ⬜ 남은 일(대부분 계정 소유자가 직접) · ⚠ 위험/주의
-> 스토어 원고: [store/PLAY_STORE_LISTING.md](store/PLAY_STORE_LISTING.md) · 정책 답변: [store/PLAY_CONSOLE_FORMS.md](store/PLAY_CONSOLE_FORMS.md) · 처리방침: [store/PRIVACY_POLICY.md](store/PRIVACY_POLICY.md)
+> 스토어 원고: [store/PLAY_STORE_LISTING.md](store/PLAY_STORE_LISTING.md) · 정책 답변: [store/PLAY_CONSOLE_FORMS.md](store/PLAY_CONSOLE_FORMS.md) · 처리방침: [store/PRIVACY_POLICY.md](store/PRIVACY_POLICY.md) · 비공개 테스트: [store/CLOSED_TEST_GUIDE.md](store/CLOSED_TEST_GUIDE.md)
 
 ## 1. 출시를 막는 항목 (제출 전 반드시)
 
 | | 항목 | 내용 |
 |---|---|---|
-| ⬜ | 지원 이메일 | `app.json` → `expo.extra.supportEmail`. 앱 마이 > 문의하기·처리방침 9항에 표시됨. Play 등록정보 연락처와 같은 주소 |
-| ⬜ | 처리방침 게시 | `store/PRIVACY_POLICY.md`의 `{{개발자명}}`, `{{연락처 이메일}}` 채움 → `store/privacy-policy.html`로 공개 URL 게시 → `app.json` `expo.extra.privacyPolicyUrl`과 Play Console에 같은 URL. ⚠ 이 저장소는 비공개라 GitHub Pages(무료)로는 바로 못 씀 → 공개 저장소/Notion 공개 페이지/Google Sites 등 |
-| ⬜ | 휴대전화 스크린샷 2~8장 | 촬영 목록·주의(Flip5 비율 2.44:1은 거절됨 → 2:1 이하로 자르기)는 등록정보 문서 참고 |
-| ⬜ | 비공개 테스트 요건 | ⚠ 2023-11-13 이후 만든 **개인** 개발자 계정은 프로덕션 신청 전에 비공개 테스트(현재 기준 테스터 12명 이상, 14일 연속 참여)를 거쳐야 함. Play Console 대시보드의 현재 요건 확인 |
+| ⚠ | **앱 이름 충돌** | Google Play 생산성 카테고리에 「딸깍 - 링크, 스크린샷, 메모 한 곳에 저장」(TEAM FOR:e, 1만+ 다운로드, 비슷한 기능)이 이미 있음 → 이름 변경 권장. `BRAND_AND_TRADEMARKS.md` |
+| ⬜ | 상표 검색 | KIPRIS 9류·42류 "딸깍"/새 이름 직접 검색 (자동 조회 실패) |
+| ✅ | 지원 이메일 | `dlacoaud96@gmail.com` — `app.json` `extra.supportEmail`, 마이 > 문의하기, 처리방침 9항 |
+| ✅ | 처리방침 게시 | https://logic-phantom.github.io/Ddalggak/privacy-policy.html (`gh-pages` 브랜치, 원본 `store/site/`). `app.json` `extra.privacyPolicyUrl` 설정 → 앱 처리방침 화면에 "웹에서 전체 처리방침 보기" 표시 |
+| ✅ | 휴대전화 스크린샷 | `store/screenshots/` 7장, 1080×2160 (웹 미리보기, 가상 데이터). 실기기 화면으로 바꾸면 더 정확 |
+| ⬜ | 비공개 테스트 요건 | ⚠ 2023-11-13 이후 만든 **개인** 계정: 테스터 12명 이상 14일 연속 → `store/CLOSED_TEST_GUIDE.md` |
 | ⬜ | 실기기 회귀 확인 | 이번 수정분(아래 3장) 포함 AAB/APK를 폰에 설치해 확인 |
+| ✅ | 패키지명 | `app.ddalggak.mobile` 유지 결정 (2026-10-26). 앱 이름을 바꾸더라도 사용자에게는 보이지 않음 |
+
+### 사이트 갱신 방법
+`docs/store/site/`를 고친 뒤 `gh-pages` 브랜치에 같은 파일을 커밋·푸시한다. 처리방침을 바꿀 때는 `PRIVACY_POLICY.md` → `site/privacy-policy.html` → 앱 `src/app/privacy.tsx` 시행일을 함께 바꾼다.
 
 ## 2. 빌드·서명
 
 | | 항목 | 상태 |
 |---|---|---|
-| ✅ | 패키지명 | `app.ddalggak.mobile` — ⚠ 첫 업로드 후 **영구히 바꿀 수 없음**. `ddalggak.app` 도메인을 소유하지 않으면 지금 바꿀지 결정 (BRAND 문서) |
+| ✅ | 패키지명 | `app.ddalggak.mobile` (유지 결정) — 첫 업로드 후 바꿀 수 없음 |
 | 🛠 | 버전 | `1.0.0` (app.json·package.json). versionCode는 EAS 원격 관리(`appVersionSource: remote`, production `autoIncrement`) |
 | ✅ | 타깃 SDK | 36 (Expo SDK 58 / RN 0.88 기본) |
 | ✅ | 서명 | EAS 서버 보관 키스토어 = 업로드 키. Play App Signing 사용(신규 앱 기본) |
@@ -49,6 +55,7 @@ npx eas-cli@latest submit --platform android --profile production
 | 🛠 | 광고 ID 권한이 라이브러리로 섞여 들어올 가능성 | `com.google.android.gms.permission.AD_ID` 차단 → 데이터 보안·광고 ID 설문 "아니요"와 일치 |
 | 🛠 | 스플래시 배경이 앱 배경과 약간 달라 전환 시 번쩍임 | 현재 토큰(`#F5F8F7` / 다크 `#0E1311`)으로 맞춤 |
 | 🛠 | 스토어 그래픽 없음 | `python scripts/build-app-icons.py --store` → `store/assets/` 512 아이콘·1024×500 그래픽 |
+| 🛠 | 스크린샷·처리방침 페이지 없음 | `scripts/store-screenshots.mjs` → `store/screenshots/`, GitHub Pages 소개·처리방침 페이지 게시 |
 
 ## 4. 실기기 회귀 테스트 (새 빌드로)
 

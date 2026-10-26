@@ -81,10 +81,10 @@ src/generated/       오픈소스 고지 목록 (scripts/license-audit.mjs가 �
 tests/               unit, share-intent, extraction-fixtures(가상 텍스트)
 scripts/             앱 아이콘 생성, 라이선스 감사, Android 기기 QA
 docs/                아키텍처·결정·POC·개인정보·위협 모델·라이선스·비용·테스트·로드맵·출시
-docs/store/          Play 등록정보 원고, 정책 답변, 처리방침(웹 게시용), 스토어 그래픽
+docs/store/          Play 등록정보 원고, 정책 답변, 처리방침, 비공개 테스트 안내, 스토어 그래픽·스크린샷, site/(gh-pages 원본)
 ```
 
-출시: [RELEASE_CHECKLIST](docs/RELEASE_CHECKLIST.md) · [스토어 등록정보](docs/store/PLAY_STORE_LISTING.md) · [Play Console 답변](docs/store/PLAY_CONSOLE_FORMS.md) · [개인정보 처리방침](docs/store/PRIVACY_POLICY.md)
+출시: [RELEASE_CHECKLIST](docs/RELEASE_CHECKLIST.md) · [스토어 등록정보](docs/store/PLAY_STORE_LISTING.md) · [Play Console 답변](docs/store/PLAY_CONSOLE_FORMS.md) · [개인정보 처리방침](docs/store/PRIVACY_POLICY.md) ([게시본](https://logic-phantom.github.io/Ddalggak/privacy-policy.html)) · [비공개 테스트](docs/store/CLOSED_TEST_GUIDE.md)
 
 자세한 내용: [ARCHITECTURE](docs/ARCHITECTURE.md) · [DECISIONS](docs/DECISIONS.md) · [DATA_MODEL](docs/DATA_MODEL.md) · [PRIVACY](docs/PRIVACY.md) · [THREAT_MODEL](docs/THREAT_MODEL.md) · [LICENSES](docs/LICENSES_AND_COPYRIGHT.md) · [COSTS](docs/APP_STORE_AND_COSTS.md) · [BRAND](docs/BRAND_AND_TRADEMARKS.md) · [TESTING](docs/TESTING.md) · [ROADMAP](docs/ROADMAP.md)
 
@@ -219,7 +219,7 @@ docs/store/          Play 등록정보 원고, 정책 답변, 처리방침(웹 �
 - 개인정보 화면을 실제 처리방침으로 교체, 오픈소스 라이선스 화면 추가(D-016).
 - `WRITE_EXTERNAL_STORAGE`, `AD_ID` 권한 차단(D-017). 스플래시 배경을 현재 토큰에 맞춤. `eas.json` 제출 트랙 internal/draft.
 
-**만든 것**: `docs/RELEASE_CHECKLIST.md`, `docs/store/PLAY_STORE_LISTING.md`(이름·설명·출시 노트·스크린샷 목록), `docs/store/PLAY_CONSOLE_FORMS.md`(데이터 보안·콘텐츠 등급·타겟층·권한), `docs/store/PRIVACY_POLICY.md` + `privacy-policy.html`, `docs/store/assets/`(512 아이콘·1024×500 그래픽, `python scripts/build-app-icons.py --store`).
+**만든 것**: `docs/RELEASE_CHECKLIST.md`, `docs/store/PLAY_STORE_LISTING.md`(이름·설명·출시 노트·스크린샷 목록), `docs/store/PLAY_CONSOLE_FORMS.md`(데이터 보안·콘텐츠 등급·타겟층·권한), `docs/store/PRIVACY_POLICY.md` + `site/privacy-policy.html`, `docs/store/assets/`(512 아이콘·1024×500 그래픽, `python scripts/build-app-icons.py --store`).
 
 **실행한 명령과 결과**
 - `npx tsc --noEmit` 통과 · `npx expo lint` 통과 · `npx jest` 127/127 · `npx expo-doctor` 20/20
@@ -231,3 +231,12 @@ docs/store/          Play 등록정보 원고, 정책 답변, 처리방침(웹 �
 **미검증**: 알림 수정 2건은 실기기 미확인(웹은 알림 미지원). 새 APK/AAB 빌드·설치 안 함.
 
 **남은 일(계정 소유자)**: 지원 이메일, 처리방침 게시 URL, 휴대전화 스크린샷, 비공개 테스트(신규 개인 계정 요건), 상표 확인 → `docs/RELEASE_CHECKLIST.md` 1장.
+
+### 2026-10-26 — 출시 자료 마무리 (연락처·처리방침 게시·스크린샷·이름 조사)
+
+- 지원 이메일·개발자명 반영(`app.json` `extra.supportEmail`, 처리방침). 패키지명 `app.ddalggak.mobile` 유지 결정.
+- 처리방침·소개 페이지를 `gh-pages` 브랜치로 GitHub Pages 게시: https://logic-phantom.github.io/Ddalggak/privacy-policy.html (원본 `docs/store/site/`), `extra.privacyPolicyUrl` 설정.
+- 스토어 스크린샷 7장(1080×2160, 가상 데이터)을 웹 미리보기 + Chrome(puppeteer-core)으로 촬영 → `docs/store/screenshots/`, 재촬영 스크립트 `scripts/store-screenshots.mjs`. 웹 미리보기는 전체 새로고침 때 SQLite(OPFS) 잠금이 남아 DB 열기가 가끔 실패함(웹 전용 현상, 스크립트에서 재시도).
+- `docs/store/CLOSED_TEST_GUIDE.md`(비공개 테스트 일정·설정·모집 문구) 추가.
+- ⚠ Google Play 동명 앱 조사: 같은 생산성 카테고리에 「딸깍 - 링크, 스크린샷, 메모 한 곳에 저장」(TEAM FOR:e, 1만+)이 있어 **앱 이름 변경 권장** → `docs/BRAND_AND_TRADEMARKS.md`. KIPRIS는 자동 조회 실패로 미확인.
+- 실행: `npx tsc --noEmit` 통과, `npx expo lint` 통과, `npx jest` 127/127. 웹 미리보기에서 문의하기·웹 처리방침 링크 표시 확인.
