@@ -36,7 +36,7 @@
 
 ## 검증 절차
 1. `npx expo prebuild --clean` 후 `npx expo run:android` (또는 `eas build --profile development`).
-2. 각 출처 앱에서 공유 → KeepOn 선택 → 캡처 화면의 "받은 내용" 항목과 거부 메시지 확인.
+2. 각 출처 앱에서 공유 → 킵온 선택 → 캡처 화면의 "받은 내용" 항목과 거부 메시지 확인.
 3. 앱 강제 종료 상태에서 공유 → 앱이 캡처 화면으로 열리는지.
 4. 공유 직후 원본 앱에서 파일 삭제 → 복사본이 남는지(`content://` 수명).
 5. 결과를 위 표와 README Work Log에 기록. 실패도 그대로 기록.

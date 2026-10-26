@@ -53,7 +53,7 @@ export default function RemindersScreen() {
         <InlineMessage
           tone="warning"
           title="알림 권한이 꺼져 있어요"
-          message="아래 일정은 앱 안에서만 보여요. 기기 알림을 받으려면 설정에서 KeepOn 알림을 허용해 주세요."
+          message="아래 일정은 앱 안에서만 보여요. 기기 알림을 받으려면 설정에서 킵온 알림을 허용해 주세요."
           action={<GhostButton compact label="기기 설정 열기" onPress={() => Linking.openSettings().catch(() => {})} />}
         />
       ) : null}

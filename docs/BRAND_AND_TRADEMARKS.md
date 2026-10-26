@@ -1,9 +1,9 @@
 # 브랜드·상표
 
-- 앱 이름: **KeepOn (킵온)** — 2026-10-26 "딸깍"에서 변경(아래 조사·결정 참고).
+- 앱 이름: **킵온 (KeepOn)** — 2026-10-26 "딸깍"에서 변경(아래 조사·결정 참고). 사용자에게 보이는 이름은 한글 "킵온", 영문 표기 KeepOn.
 - 슬로건: "저장한 정보, 놓치지 않게." / "Save it. Keep on it."
-- 기기 표시 이름(홈 화면·공유 메뉴): `KeepOn` · 스토어 표시명: `KeepOn 킵온 - 링크·쿠폰·예약 정보함`
-- 바꾸지 않은 내부 식별자: 패키지 `app.ddalggak.mobile`, 스킴 `ddalggak://`, EAS slug `ddalggak`, DB `ddalggak.db`, 내보내기 형식 `ddalggak-export`, 저장소 이름 — 사용자에게 보이지 않고, 바꾸면 기존 데이터·빌드 연결이 끊김.
+- 기기 표시 이름(홈 화면·공유 메뉴): `킵온` · 스토어 표시명: `킵온(KeepOn) - 링크·쿠폰·예약 정보함` · GitHub 저장소: `Logic-Phantom/KeepOn`
+- 바꾸지 않은 내부 식별자: 패키지 `app.ddalggak.mobile`, 스킴 `ddalggak://`, EAS slug `ddalggak`, DB `ddalggak.db`, 내보내기 형식 `ddalggak-export` — 사용자에게 보이지 않고, 바꾸면 기존 데이터·빌드 연결이 끊김.
 - 패키지/번들 id: `app.ddalggak.mobile` (도메인 `ddalggak.app` 소유 여부 미확인 — 출시 전 실제 소유 도메인으로 교체 권장).
 - 로고: 직접 그린 "트레이 + 점" 도형(`scripts/build-app-icons.py`). 기존 앱 로고·아이콘 참고 없음.
 

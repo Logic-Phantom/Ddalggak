@@ -1,4 +1,4 @@
-# Draws the KeepOn app icon set from simple vector shapes (original artwork, no external assets).
+# Draws the 킵온 (KeepOn) app icon set from simple vector shapes (original artwork, no external assets).
 # Usage: python scripts/build-app-icons.py   (needs Pillow: python -m pip install Pillow)
 # Output: assets/images/{icon,android-icon-foreground,android-icon-monochrome,splash-icon,favicon}.png
 #
@@ -90,7 +90,8 @@ def build_store_assets() -> None:
     tagline = ImageFont.truetype(str(fonts / 'Pretendard-SemiBold.otf'), 44)
     note = ImageFont.truetype(str(fonts / 'Pretendard-Medium.otf'), 30)
     x = 470
-    d.text((x, 92), 'KeepOn', font=title, fill=(255, 255, 255))
+    d.text((x, 92), '킵온', font=title, fill=(255, 255, 255))
+    d.text((x + d.textlength('킵온', font=title) + 22, 150), 'KeepOn', font=tagline, fill=(214, 225, 255))
     d.text((x, 252), '저장한 정보, 놓치지 않게.', font=tagline, fill=(255, 255, 255))
     d.text((x, 330), '공유하면 모이고, 기한은 알림으로', font=note, fill=(214, 225, 255))
     d.text((x, 374), '로그인 없이 기기 안에만 저장', font=note, fill=(214, 225, 255))

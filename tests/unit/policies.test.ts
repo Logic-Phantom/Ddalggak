@@ -141,7 +141,7 @@ describe('export archive', () => {
 
   it('rejects foreign files, bad versions, duplicate ids and bad dates', () => {
     expect(validateArchive(null)).toHaveLength(1);
-    expect(validateArchive({ format: 'other', schemaVersion: 1, items: [] })[0]).toContain('KeepOn');
+    expect(validateArchive({ format: 'other', schemaVersion: 1, items: [] })[0]).toContain('킵온');
     expect(validateArchive({ format: 'ddalggak-export', schemaVersion: 99, items: [] })[0]).toContain('버전');
     const bad = {
       format: 'ddalggak-export',

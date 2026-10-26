@@ -1,8 +1,8 @@
-# KeepOn (킵온)
+# 킵온 (KeepOn)
 
 > 저장한 정보, 놓치지 않게.
 
-앱 이름은 2026-10-26에 "딸깍"에서 KeepOn으로 바뀌었다(`docs/BRAND_AND_TRADEMARKS.md`). 저장소·패키지(`app.ddalggak.mobile`)·스킴·DB 이름은 그대로다.
+앱 이름은 2026-10-26에 "딸깍"에서 킵온(KeepOn)으로 바뀌었다(`docs/BRAND_AND_TRADEMARKS.md`, D-019·D-020). 저장소는 `Logic-Phantom/KeepOn`. 패키지(`app.ddalggak.mobile`)·스킴·DB 이름은 그대로다.
 
 다른 앱에서 발견한 링크·텍스트·이미지·문서를 공유 메뉴로 보내 두면, 기기 안에서 날짜·금액·쿠폰 코드 같은 정보를 **후보로** 찾아 주고, 사용자가 확인한 날짜로만 알림을 만들어 주는 개인용 생활정보 인박스입니다.
 
@@ -24,7 +24,7 @@
 | 로컬 알림 (확인된 날짜만) | 구현, Android 실기기 예약·완료 시 취소 확인. 알림을 눌러 앱 열기(종료 상태) 수정은 실기기 미확인 |
 | 검색·분류·태그·보관·완료·삭제 | 구현 |
 | JSON 내보내기/가져오기, 전체 삭제 | 구현 (첨부 파일은 내보내기에 미포함) |
-| 개인정보 처리방침·오픈소스 라이선스 화면 | 구현, 웹 미리보기 확인 (처리방침 웹 게시본: https://logic-phantom.github.io/Ddalggak/privacy-policy.html) |
+| 개인정보 처리방침·오픈소스 라이선스 화면 | 구현, 웹 미리보기 확인 (처리방침 웹 게시본: https://logic-phantom.github.io/KeepOn/privacy-policy.html) |
 | Google Play 출시 | 자료 준비 완료, 비공개 테스트 전 ([체크리스트](docs/RELEASE_CHECKLIST.md)) |
 | iOS | 미검증 (EAS Build + Apple Developer 계정 필요) |
 
@@ -88,7 +88,7 @@ docs/                아키텍처·결정·POC·개인정보·위협 모델·라
 docs/store/          Play 등록정보 원고, 정책 답변, 처리방침, 비공개 테스트 안내, 스토어 그래픽·스크린샷, site/(gh-pages 원본)
 ```
 
-출시: [RELEASE_CHECKLIST](docs/RELEASE_CHECKLIST.md) · [스토어 등록정보](docs/store/PLAY_STORE_LISTING.md) · [Play Console 답변](docs/store/PLAY_CONSOLE_FORMS.md) · [개인정보 처리방침](docs/store/PRIVACY_POLICY.md) ([게시본](https://logic-phantom.github.io/Ddalggak/privacy-policy.html)) · [비공개 테스트](docs/store/CLOSED_TEST_GUIDE.md)
+출시: [RELEASE_CHECKLIST](docs/RELEASE_CHECKLIST.md) · [스토어 등록정보](docs/store/PLAY_STORE_LISTING.md) · [Play Console 답변](docs/store/PLAY_CONSOLE_FORMS.md) · [개인정보 처리방침](docs/store/PRIVACY_POLICY.md) ([게시본](https://logic-phantom.github.io/KeepOn/privacy-policy.html)) · [비공개 테스트](docs/store/CLOSED_TEST_GUIDE.md)
 
 자세한 내용: [ARCHITECTURE](docs/ARCHITECTURE.md) · [DECISIONS](docs/DECISIONS.md) · [DATA_MODEL](docs/DATA_MODEL.md) · [PRIVACY](docs/PRIVACY.md) · [THREAT_MODEL](docs/THREAT_MODEL.md) · [LICENSES](docs/LICENSES_AND_COPYRIGHT.md) · [COSTS](docs/APP_STORE_AND_COSTS.md) · [BRAND](docs/BRAND_AND_TRADEMARKS.md) · [TESTING](docs/TESTING.md) · [ROADMAP](docs/ROADMAP.md)
 
@@ -239,7 +239,7 @@ docs/store/          Play 등록정보 원고, 정책 답변, 처리방침, 비�
 ### 2026-10-26 — 출시 자료 마무리 (연락처·처리방침 게시·스크린샷·이름 조사)
 
 - 지원 이메일·개발자명 반영(`app.json` `extra.supportEmail`, 처리방침). 패키지명 `app.ddalggak.mobile` 유지 결정.
-- 처리방침·소개 페이지를 `gh-pages` 브랜치로 GitHub Pages 게시: https://logic-phantom.github.io/Ddalggak/privacy-policy.html (원본 `docs/store/site/`), `extra.privacyPolicyUrl` 설정.
+- 처리방침·소개 페이지를 `gh-pages` 브랜치로 GitHub Pages 게시: https://logic-phantom.github.io/KeepOn/privacy-policy.html (원본 `docs/store/site/`), `extra.privacyPolicyUrl` 설정.
 - 스토어 스크린샷 7장(1080×2160, 가상 데이터)을 웹 미리보기 + Chrome(puppeteer-core)으로 촬영 → `docs/store/screenshots/`, 재촬영 스크립트 `scripts/store-screenshots.mjs`. 웹 미리보기는 전체 새로고침 때 SQLite(OPFS) 잠금이 남아 DB 열기가 가끔 실패함(웹 전용 현상, 스크립트에서 재시도).
 - `docs/store/CLOSED_TEST_GUIDE.md`(비공개 테스트 일정·설정·모집 문구) 추가.
 - ⚠ Google Play 동명 앱 조사: 같은 생산성 카테고리에 「딸깍 - 링크, 스크린샷, 메모 한 곳에 저장」(TEAM FOR:e, 1만+)이 있어 **앱 이름 변경 권장** → `docs/BRAND_AND_TRADEMARKS.md`. KIPRIS는 자동 조회 실패로 미확인.
@@ -273,7 +273,7 @@ docs/store/          Play 등록정보 원고, 정책 답변, 처리방침, 비�
 | `37628ff` | "딸깍" 유지 결정 기록(이후 번복) |
 | `fb8c7c5` | 앱 이름 KeepOn(킵온)으로 변경 |
 
-**게시**: `gh-pages` 브랜치(`docs/store/site/`와 같은 내용) → GitHub Pages 자동 활성화. https://logic-phantom.github.io/Ddalggak/ , https://logic-phantom.github.io/Ddalggak/privacy-policy.html
+**게시**: `gh-pages` 브랜치(`docs/store/site/`와 같은 내용) → GitHub Pages 자동 활성화. https://logic-phantom.github.io/KeepOn/ , https://logic-phantom.github.io/KeepOn/privacy-policy.html
 
 **알아 둘 점(개발 환경)**
 - `app.json`을 고친 뒤 웹 미리보기에 옛 값이 보이면 Metro 캐시 때문 → `npx expo start --web --clear`. 출시 빌드는 매번 새로 읽으므로 영향 없음.
@@ -284,3 +284,9 @@ docs/store/          Play 등록정보 원고, 정책 답변, 처리방침, 비�
 - production AAB 빌드 → 내부 테스트 설치 → 실기기 회귀 테스트(알림 탭 열기, 새 이름 표시 등)
 - 비공개 테스트(테스터 12명 이상·14일, `docs/store/CLOSED_TEST_GUIDE.md`) → 프로덕션 신청
 - `release/1.0.0-prep` → `main` PR·병합
+
+### 2026-10-26 — 표시 이름 "킵온"으로 통일, 저장소 이름 KeepOn (D-020)
+
+- 기기 표시 이름(`app.json` `name`)·`BRAND_NAME`·앱 안 문구(홈 제목 "놓치지 않게 킵온.", 공유 안내 "‘킵온’을 고르세요", 오류·처리방침·라이선스·내보내기 문구)를 "킵온"으로 바꿈. 영문 KeepOn은 보조 표기.
+- 스토어 표시명 `킵온(KeepOn) - 링크·쿠폰·예약 정보함`, 설명·출시 노트·비공개 테스트 문구, 처리방침(앱·웹), 소개 페이지, 피처 그래픽(킵온 + KeepOn), 스크린샷 7장 다시 만듦.
+- GitHub 저장소 이름 `Ddalggak` → `KeepOn`(GitHub 설정에서 소유자가 변경). Pages 주소가 `/KeepOn/`으로 바뀌어 `extra.privacyPolicyUrl`·문서 주소를 갱신하고, 로컬 `origin` 주소도 새 저장소로 바꿈.

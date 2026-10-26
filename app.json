@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "KeepOn",
+    "name": "킵온",
     "slug": "ddalggak",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -40,8 +40,8 @@
     "web": {
       "output": "single",
       "favicon": "./assets/images/favicon.png",
-      "name": "KeepOn",
-      "shortName": "KeepOn",
+      "name": "킵온",
+      "shortName": "킵온",
       "themeColor": "#2F5BD3",
       "backgroundColor": "#F6F7F9"
     },
@@ -107,7 +107,7 @@
       "reactCompiler": true
     },
     "extra": {
-      "privacyPolicyUrl": "https://logic-phantom.github.io/Ddalggak/privacy-policy.html",
+      "privacyPolicyUrl": "https://logic-phantom.github.io/KeepOn/privacy-policy.html",
       "supportEmail": "dlacoaud96@gmail.com",
       "router": {
         "asyncRoutes": {

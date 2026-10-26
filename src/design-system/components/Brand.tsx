@@ -4,8 +4,8 @@ import { View, type StyleProp, type ViewStyle } from 'react-native';
 import { fonts, spacing } from '../tokens';
 import { AppText } from './AppText';
 
-export const BRAND_NAME = 'KeepOn';
-/** Slogan (see docs/BRAND_AND_TRADEMARKS.md). Korean reading of the name: 킵온. */
+export const BRAND_NAME = '킵온';
+/** Slogan (see docs/BRAND_AND_TRADEMARKS.md). English name: KeepOn. */
 export const BRAND_TAGLINE = '저장한 정보, 놓치지 않게.';
 
 const LOGO = require('@/assets/images/splash-icon.png');

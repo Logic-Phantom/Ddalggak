@@ -50,7 +50,7 @@ function NoticeRow({ notice }: { notice: Notice }) {
 export default function LicensesScreen() {
   return (
     <ScreenScroll>
-      <AppText variant="secondary" tone="secondary">KeepOn은 아래 오픈소스 소프트웨어를 사용해요. 항목을 누르면 저작권 표시와 라이선스 전문을 볼 수 있어요.</AppText>
+      <AppText variant="secondary" tone="secondary">킵온은 아래 오픈소스 소프트웨어를 사용해요. 항목을 누르면 저작권 표시와 라이선스 전문을 볼 수 있어요.</AppText>
       <Card padded={false}>
         {PACKAGES.map((p, i) => (
           <View key={`${p.name}@${p.version}`}>

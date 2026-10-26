@@ -7,10 +7,10 @@
 
 | | 항목 | 내용 |
 |---|---|---|
-| ✅ | 앱 이름 | **KeepOn(킵온)** — 2026-10-26 "딸깍"에서 변경(같은 카테고리 동명 앱 충돌). 스토어 표시명 `KeepOn 킵온 - 링크·쿠폰·예약 정보함`, 기기 표시 이름 `KeepOn`. Play 조사 결과는 `BRAND_AND_TRADEMARKS.md` |
+| ✅ | 앱 이름 | **킵온(KeepOn)** — 2026-10-26 "딸깍"에서 변경(같은 카테고리 동명 앱 충돌). 스토어 표시명 `킵온(KeepOn) - 링크·쿠폰·예약 정보함`, 기기 표시 이름 `킵온`. Play 조사 결과는 `BRAND_AND_TRADEMARKS.md` |
 | ⬜ | 상표 검색 | KIPRIS 9류·42류 "KeepOn", "킵온", "Keep On" 직접 검색 (자동 조회 실패) |
 | ✅ | 지원 이메일 | `dlacoaud96@gmail.com` — `app.json` `extra.supportEmail`, 마이 > 문의하기, 처리방침 9항 |
-| ✅ | 처리방침 게시 | https://logic-phantom.github.io/Ddalggak/privacy-policy.html (`gh-pages` 브랜치, 원본 `store/site/`). `app.json` `extra.privacyPolicyUrl` 설정 → 앱 처리방침 화면에 "웹에서 전체 처리방침 보기" 표시 |
+| ⬜ | 처리방침 게시 | https://logic-phantom.github.io/KeepOn/privacy-policy.html — ⚠ GitHub 저장소 이름을 `KeepOn`으로 바꾸고 `gh-pages`를 다시 게시해야 이 주소가 열림(옛 `/Ddalggak/` 주소는 자동 이동되지 않음) (`gh-pages` 브랜치, 원본 `store/site/`). `app.json` `extra.privacyPolicyUrl` 설정 → 앱 처리방침 화면에 "웹에서 전체 처리방침 보기" 표시 |
 | ✅ | 휴대전화 스크린샷 | `store/screenshots/` 7장, 1080×2160 (웹 미리보기, 가상 데이터). 실기기 화면으로 바꾸면 더 정확 |
 | ⬜ | 비공개 테스트 요건 | ⚠ 2023-11-13 이후 만든 **개인** 계정: 테스터 12명 이상 14일 연속 → `store/CLOSED_TEST_GUIDE.md` |
 | ⬜ | 실기기 회귀 확인 | 이번 수정분(아래 3장) 포함 AAB/APK를 폰에 설치해 확인 |
@@ -64,7 +64,7 @@ npx eas-cli@latest submit --platform android --profile production
 | ⬜ | 알림 예약 → 앱 강제 종료 → 알림 탭 | 앱이 열리고 해당 항목 상세로 이동 |
 | ⬜ | 앱 실행 중 알림 탭 | 해당 항목 상세로 이동 (한 번만) |
 | ⬜ | 마이 > 개인정보 처리방침 / 오픈소스 라이선스 | 내용 표시, 항목 펼치기 |
-| ⬜ | 마이 하단 버전·이름 | `KeepOn 1.0.0`, 홈 화면·공유 메뉴에 `KeepOn` 표시 |
+| ⬜ | 마이 하단 버전·이름 | `킵온 1.0.0`, 홈 화면·공유 메뉴에 `킵온` 표시 |
 | ⬜ | 알림 권한 거부 후 알림 만들기 | "알림 탭에서 일정을 확인할 수 있어요" 문구 |
 | ⬜ | 사진 선택 (Android 13+ / 12 이하) | 권한 팝업 없이 시스템 선택기 |
 | ⬜ | 공유 수신: Chrome 링크, 카카오톡 텍스트, 갤러리 이미지, 파일 앱 PDF | `SHARE_RECEIVING_POC.md` 표 갱신 |

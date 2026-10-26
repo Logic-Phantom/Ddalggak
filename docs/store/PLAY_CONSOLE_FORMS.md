@@ -8,7 +8,7 @@
 
 | 설문 | 답 |
 |---|---|
-| 개인정보처리방침 | https://logic-phantom.github.io/Ddalggak/privacy-policy.html (앱 안: 마이 > 개인정보 처리방침) |
+| 개인정보처리방침 | https://logic-phantom.github.io/KeepOn/privacy-policy.html (앱 안: 마이 > 개인정보 처리방침) |
 | 광고 | 광고 없음 |
 | 앱 액세스 권한 | 모든 기능을 별도 액세스 권한 없이 사용 가능 (로그인 없음) |
 | 콘텐츠 등급 | IARC 설문 → 예상 등급: 전체이용가 / Everyone / PEGI 3 |
@@ -23,7 +23,7 @@
 
 ## 데이터 보안 (Data safety)
 
-Google 정의상 "수집"은 데이터를 **기기 밖으로 전송**하는 것이다. KeepOn은 기기 안에서만 처리하므로 수집·공유가 없다.
+Google 정의상 "수집"은 데이터를 **기기 밖으로 전송**하는 것이다. 킵온은 기기 안에서만 처리하므로 수집·공유가 없다.
 
 | 문항 | 답 | 근거 |
 |---|---|---|
@@ -80,4 +80,4 @@ Google 정의상 "수집"은 데이터를 **기기 밖으로 전송**하는 것�
 - 타깃 API: **36** (RN 0.88 / Expo SDK 58 기본값). Play 신규 앱 요건(현재 35 이상) 충족 — 제출 시점 요건은 Console 경고로 재확인.
 - 16KB 메모리 페이지 크기: RN 0.77+ 네이티브 라이브러리는 16KB 정렬로 빌드됨. AAB 업로드 후 Console의 "16KB 페이지 크기" 경고 여부 확인.
 - 메타데이터: 설명에 OCR 등 미구현 기능을 쓰지 않음(기만적 행위 정책).
-- 상표: "KeepOn"/"킵온" KIPRIS 확인 미완료 → `docs/BRAND_AND_TRADEMARKS.md`.
+- 상표: "킵온"/"킵온" KIPRIS 확인 미완료 → `docs/BRAND_AND_TRADEMARKS.md`.

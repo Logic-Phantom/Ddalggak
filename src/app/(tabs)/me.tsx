@@ -37,7 +37,7 @@ export default function MeScreen() {
           <Ionicons name="person" size={28} color={c.accentText} />
         </View>
         <View style={{ flex: 1 }}>
-          <AppText variant="sectionTitle">내 KeepOn</AppText>
+          <AppText variant="sectionTitle">내 킵온</AppText>
           <AppText variant="caption" tone="tertiary">로그인 없이 이 기기에만 저장 중이에요</AppText>
         </View>
         <BrandMark size={30} />
@@ -64,7 +64,7 @@ export default function MeScreen() {
         {SUPPORT_EMAIL ? (
           <>
             <Divider inset={spacing.md} />
-            <ListRow icon="mail-outline" label="문의하기" value={SUPPORT_EMAIL} role="button" onPress={() => Linking.openURL(`mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(`[KeepOn ${APP_VERSION}] 문의`)}`).catch(() => {})} />
+            <ListRow icon="mail-outline" label="문의하기" value={SUPPORT_EMAIL} role="button" onPress={() => Linking.openURL(`mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(`[킵온 ${APP_VERSION}] 문의`)}`).catch(() => {})} />
           </>
         ) : null}
       </Card>
@@ -73,13 +73,13 @@ export default function MeScreen() {
         <View style={{ gap: spacing.xxs }}>
           <AppText variant="label">도움말</AppText>
           <AppText variant="secondary" tone="secondary">
-            다른 앱에서 공유 버튼 → ‘KeepOn’을 고르세요. 처음에는 목록 끝의 ‘더보기’ 안에 있을 수 있어요.
+            다른 앱에서 공유 버튼 → ‘킵온’을 고르세요. 처음에는 목록 끝의 ‘더보기’ 안에 있을 수 있어요.
           </AppText>
         </View>
       </Card>
 
       <AppText variant="caption" tone="tertiary" align="center">
-        KeepOn {APP_VERSION} · 이미지 글자 인식 {currentOcrProviderId() === 'unavailable' ? '준비 중' : currentOcrProviderId()}
+        킵온 {APP_VERSION} · 이미지 글자 인식 {currentOcrProviderId() === 'unavailable' ? '준비 중' : currentOcrProviderId()}
       </AppText>
     </ScreenScroll>
   );

@@ -6,7 +6,7 @@ import { AppText, BRAND_NAME, BRAND_TAGLINE, BrandMark, PrimaryButton, fonts, sp
 import { useAppState } from '@/hooks/app-state';
 
 const POINTS = [
-  { title: '공유하면 모여요', body: '카카오톡·브라우저·갤러리의 공유 메뉴에서 ‘KeepOn’을 고르세요.' },
+  { title: '공유하면 모여요', body: '카카오톡·브라우저·갤러리의 공유 메뉴에서 ‘킵온’을 고르세요.' },
   { title: '날짜·금액은 후보로', body: '기기 안의 규칙으로 찾아 보여 드리고, 직접 확인한 값만 알림에 써요.' },
   { title: '기기 안에만 저장', body: '로그인·서버 없이 동작해요. 앱이 사진첩이나 대화를 스스로 읽지 않아요.' },
 ];
