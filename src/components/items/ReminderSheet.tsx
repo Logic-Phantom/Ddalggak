@@ -51,8 +51,8 @@ export function ReminderSheet({ item, visible, onClose, onCreated, defaultHour }
         res.scheduled
           ? `${formatLocal(res.reminder.scheduledAt)}에 알려 드릴게요.`
           : res.permission === 'unavailable'
-            ? '이 실행 환경(Expo Go 등)에서는 기기 알림을 쓸 수 없어요. 기한 탭에서 일정을 확인할 수 있어요.'
-            : '알림 권한이 없어 기기 알림은 예약하지 못했어요. 기한 탭에서 일정을 확인할 수 있어요.',
+            ? '이 실행 환경(Expo Go 등)에서는 기기 알림을 쓸 수 없어요. 알림 탭에서 일정을 확인할 수 있어요.'
+            : '알림 권한이 없어 기기 알림은 예약하지 못했어요. 알림 탭에서 일정을 확인할 수 있어요.',
       );
       onClose();
     } catch (e) {

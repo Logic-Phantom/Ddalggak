@@ -28,7 +28,7 @@ function DueRow({ title, sub, when, onPress, badge }: { title: string; sub: stri
   );
 }
 
-/** 기한 탭: confirmed dates and scheduled reminders. Works even when notifications are denied. */
+/** 알림 탭: confirmed dates and scheduled reminders. Works even when notifications are denied. */
 export default function RemindersScreen() {
   const router = useRouter();
   const { data } = useLoader(async () => {

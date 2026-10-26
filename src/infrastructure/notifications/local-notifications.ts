@@ -4,7 +4,8 @@ import { parseLocal } from '@/utils/dates';
 
 /**
  * Local notifications only — no push token, no server. Delivery is up to the OS (battery savers,
- * Focus modes, force-stop can delay or drop it); the in-app 기한 tab is the source of truth.
+ * Focus modes, force-stop can delay or drop it); the in-app 알림 tab is the source of truth.
+ * No exact-alarm permission is requested, so Android may deliver a few minutes late (Doze).
  *
  * expo-notifications is loaded lazily: Expo Go (Android) lacks some of its native modules and the
  * package throws on import there. In that case notifications are reported as unavailable and
@@ -90,13 +91,31 @@ export async function scheduledIds(): Promise<string[]> {
   return all.map((x) => x.identifier);
 }
 
-/** Opens the item when the user taps a notification. */
+/**
+ * Opens the item when the user taps a notification. A tap that launched the app from a killed state
+ * fires before this listener exists, so the last response is read once and then cleared.
+ */
 export function onNotificationOpened(handler: (itemId: string) => void): () => void {
   const n = N();
   if (!n) return () => {};
-  const sub = n.addNotificationResponseReceivedListener((r) => {
-    const itemId = r.notification.request.content.data?.itemId;
+  const open = (r: import('expo-notifications').NotificationResponse | null) => {
+    const itemId = r?.notification.request.content.data?.itemId;
     if (typeof itemId === 'string') handler(itemId);
+  };
+  let alive = true;
+  n.getLastNotificationResponseAsync()
+    .then((r) => {
+      if (!alive || !r) return;
+      open(r);
+      return n.clearLastNotificationResponseAsync();
+    })
+    .catch(() => {});
+  const sub = n.addNotificationResponseReceivedListener((r) => {
+    open(r);
+    n.clearLastNotificationResponseAsync().catch(() => {});
   });
-  return () => sub.remove();
+  return () => {
+    alive = false;
+    sub.remove();
+  };
 }

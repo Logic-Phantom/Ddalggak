@@ -1,11 +1,12 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
-import { StyleSheet, View } from 'react-native';
+import { Linking, StyleSheet, View } from 'react-native';
 
 import { AppText, BrandMark, Card, Divider, ListRow, ScreenScroll, elevation, radius, spacing, useColors } from '@/design-system';
 import { confirmedDatesBetween, countByStatus } from '@/features/items/item-repository';
 import { currentOcrProviderId } from '@/features/ocr/ocr-service';
 import { useLoader } from '@/hooks/use-loader';
+import { APP_VERSION, SUPPORT_EMAIL } from '@/utils/app-info';
 import { addDays, toYmd } from '@/utils/dates';
 
 function Stat({ label, value, tone }: { label: string; value: number | string; tone?: 'error' }) {
@@ -57,7 +58,15 @@ export default function MeScreen() {
         <Divider inset={spacing.md} />
         <ListRow icon="settings-outline" label="저장·데이터 설정" onPress={() => router.push('/settings')} />
         <Divider inset={spacing.md} />
-        <ListRow icon="shield-checkmark-outline" label="개인정보와 데이터" onPress={() => router.push('/privacy')} />
+        <ListRow icon="shield-checkmark-outline" label="개인정보 처리방침" onPress={() => router.push('/privacy')} />
+        <Divider inset={spacing.md} />
+        <ListRow icon="code-slash-outline" label="오픈소스 라이선스" onPress={() => router.push('/licenses')} />
+        {SUPPORT_EMAIL ? (
+          <>
+            <Divider inset={spacing.md} />
+            <ListRow icon="mail-outline" label="문의하기" value={SUPPORT_EMAIL} role="button" onPress={() => Linking.openURL(`mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(`[딸깍 ${APP_VERSION}] 문의`)}`).catch(() => {})} />
+          </>
+        ) : null}
       </Card>
 
       <Card>
@@ -70,7 +79,7 @@ export default function MeScreen() {
       </Card>
 
       <AppText variant="caption" tone="tertiary" align="center">
-        딸깍 0.1.0 · 이미지 글자 인식 {currentOcrProviderId() === 'unavailable' ? '준비 중' : currentOcrProviderId()}
+        딸깍 {APP_VERSION} · 이미지 글자 인식 {currentOcrProviderId() === 'unavailable' ? '준비 중' : currentOcrProviderId()}
       </AppText>
     </ScreenScroll>
   );

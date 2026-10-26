@@ -40,3 +40,16 @@ npx expo-doctor
 ## 스크린샷
 - `docs/screenshots/01-web-inbox-empty-light.jpg` (웹, 375×812 에뮬레이션, 라이트)
 - 나머지 화면은 웹 프리뷰 창이 가려져 캡처가 실패해 저장하지 못함(위 흐름은 확인함).
+
+## 2026-10-26 출시 전 점검 (macOS, Node 24.22.0, npm 11.19.1)
+| 항목 | 결과 |
+|---|---|
+| `npx tsc --noEmit` | 통과 |
+| `npx expo lint` | 통과 |
+| `npx jest` | **127 통과 / 0 실패** |
+| `npx expo-doctor` | 20/20 통과 |
+| `expo prebuild --platform android` 매니페스트 | targetSdk 36, versionName 1.0.0. `WRITE_EXTERNAL_STORAGE`·`AD_ID`·`READ_MEDIA_*`·`CAMERA` 등 `tools:node="remove"` 확인 (생성된 android 폴더는 삭제) |
+| 라이선스 감사 | 68개, 허용 목록 밖 0개 |
+| 웹 프리뷰(375×812) | 온보딩 → 마이(버전 1.0.0, 처리방침·오픈소스 라이선스 메뉴) → 오픈소스 라이선스(Pretendard 펼침, OFL 전문 표시) → 개인정보 처리방침(9개 항목) 확인, 콘솔 오류 없음 |
+
+미검증: 알림 콜드 스타트 탭·재예약 제목 수정은 웹에서 동작하지 않아 **실기기 미확인** → `RELEASE_CHECKLIST.md` 4장.

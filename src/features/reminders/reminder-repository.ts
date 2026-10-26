@@ -65,8 +65,11 @@ export async function upcomingReminders(nowLocal: string): Promise<{ reminder: R
   return rows.map((r) => ({ reminder: toReminder(r), item: { id: r.item_id, title: r.item_title, category: r.item_category as InboxItem['category'] } }));
 }
 
-export async function allEnabledReminders(): Promise<Reminder[]> {
+/** Enabled reminders with their item title (re-scheduling needs the same title the user saw). */
+export async function allEnabledReminders(): Promise<{ reminder: Reminder; itemTitle: string }[]> {
   const db = await getDb();
-  const rows = await db.getAllAsync<Parameters<typeof toReminder>[0]>('SELECT * FROM reminders WHERE enabled = 1');
-  return rows.map(toReminder);
+  const rows = await db.getAllAsync<Parameters<typeof toReminder>[0] & { item_title: string }>(
+    'SELECT r.*, i.title AS item_title FROM reminders r JOIN items i ON i.id = r.item_id WHERE r.enabled = 1',
+  );
+  return rows.map((r) => ({ reminder: toReminder(r), itemTitle: r.item_title }));
 }

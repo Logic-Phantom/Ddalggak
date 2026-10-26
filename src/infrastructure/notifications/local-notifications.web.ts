@@ -1,4 +1,4 @@
-/** Web preview: local notifications are not supported; reminders stay visible in the 기한 tab. */
+/** Web preview: local notifications are not supported; reminders stay visible in the 알림 tab. */
 export type PermissionState = 'granted' | 'denied' | 'undetermined' | 'unavailable';
 
 export function notificationsAvailable(): boolean {

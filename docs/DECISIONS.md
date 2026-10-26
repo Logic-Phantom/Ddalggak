@@ -72,3 +72,22 @@
 
 ## D-012 · 웹 타깃은 UI 확인용 (2026-10-24)
 - `expo start --web`은 레이아웃·흐름 점검용. 공유 수신/알림/파일 복사는 웹에서 동작하지 않음(`.web.ts` 대체 구현). 출시 대상 아님.
+
+## D-015 · 출시 정보는 app.json `extra`에서 읽음 (2026-10-26)
+- **결정**: 앱 버전은 `expo.version`, 지원 이메일·처리방침 URL은 `expo.extra.supportEmail` / `expo.extra.privacyPolicyUrl`에서 `src/utils/app-info.ts`로 읽는다. 값이 비어 있으면 해당 링크를 숨긴다.
+- **이유**: `.env.local`은 EAS 빌드에 업로드되지 않아 `EXPO_PUBLIC_*`로는 출시 빌드에 값이 빠질 수 있음. 버전 하드코딩(0.1.0)도 함께 제거.
+
+## D-016 · 앱 안 처리방침 + 오픈소스 고지 화면 (2026-10-26)
+- **결정**: `privacy.tsx`를 "출시 전 안내"에서 실제 처리방침(시행일·처리 항목·권한·문의)으로 바꾸고, 같은 내용을 `docs/store/PRIVACY_POLICY.md`(웹 게시용)에 둔다. `licenses.tsx`는 `scripts/license-audit.mjs`가 번들 소스맵 기준으로 만든 `src/generated/oss-licenses.json`을 표시한다(Pretendard OFL 포함).
+- **이유**: Google Play 사용자 데이터 정책은 Console과 앱 안 양쪽에 처리방침을 요구한다. MIT·OFL은 저작권 표시·라이선스 동봉을 요구한다.
+- **유지**: 의존성을 바꾸면 `npx expo export --platform android --source-maps --output-dir <dir>` → `node scripts/license-audit.mjs <map>`으로 JSON을 다시 만든다.
+
+## D-017 · 권한 추가 차단: WRITE_EXTERNAL_STORAGE, AD_ID (2026-10-26)
+- **결정**: `android.blockedPermissions`에 `WRITE_EXTERNAL_STORAGE`, `com.google.android.gms.permission.AD_ID` 추가. 정확한 알람 권한(`SCHEDULE_EXACT_ALARM`)은 쓰지 않는다.
+- **이유**: 앱이 외부 저장소에 쓰지 않고 광고 ID를 쓰지 않으므로 데이터 보안·광고 ID 설문 답("아니요")과 매니페스트를 일치시킨다. 정확한 알람은 Play 선언 대상이고 기한 알림(하루 전 등)에는 몇 분 오차가 허용된다.
+- **위험**: Doze 상태에서 알림이 몇 분 늦을 수 있음 → 알림 시트에 이미 안내 문구 있음.
+
+## D-018 · `allowBackup` 기본값(true) 유지 (2026-10-26)
+- **결정**: Android 자동 백업을 끄지 않는다.
+- **이유**: 서버·동기화가 없어 기기 교체 시 사용자가 데이터를 되살릴 유일한 자동 경로. 복원 후 알림은 `reconcileNotifications`가 다시 예약한다.
+- **위험**: 암호화되지 않은 DB가 사용자 Google 계정 백업에 포함될 수 있음 → 처리방침 3항에 고지. 민감도 우려가 커지면 `android.allowBackup: false` 또는 백업 제외 규칙을 검토.

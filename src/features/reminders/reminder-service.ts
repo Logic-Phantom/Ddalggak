@@ -27,7 +27,7 @@ export type CreateReminderResult = { reminder: Reminder; scheduled: boolean; per
 
 /**
  * Creates a reminder. Permission is requested here (the first time the user sets one).
- * If permission is denied the reminder is still saved and shown in the 기한 tab.
+ * If permission is denied the reminder is still saved and shown in the 알림 tab.
  */
 export async function createReminder(input: CreateReminderInput, now = new Date()): Promise<CreateReminderResult> {
   const activeCount = await countActiveReminders(nowLocal(now));
@@ -87,13 +87,13 @@ export async function reconcileNotifications(now = new Date()): Promise<void> {
     const reminders = await allEnabledReminders();
     const known = new Set<string>();
     const nowKey = nowLocal(now);
-    for (const r of reminders) {
+    for (const { reminder: r, itemTitle } of reminders) {
       if (r.notificationId && scheduled.has(r.notificationId)) {
         known.add(r.notificationId);
         continue;
       }
       if (r.scheduledAt <= nowKey) continue;
-      const id = await notifications.scheduleAt(r.scheduledAt, r.title, `${r.title} 알림이에요.`, r.itemId).catch(() => null);
+      const id = await notifications.scheduleAt(r.scheduledAt, itemTitle.slice(0, 60), `${r.title} 알림이에요.`, r.itemId).catch(() => null);
       await updateReminder(r.id, { notificationId: id });
       if (id) known.add(id);
     }

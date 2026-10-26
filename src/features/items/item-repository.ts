@@ -397,7 +397,7 @@ export async function upcomingDates(itemIds: string[], fromYmd: string): Promise
   return out;
 }
 
-/** Confirmed date fields in a window (기한 tab), joined with their active items. */
+/** Confirmed date fields in a window (알림 tab), joined with their active items. */
 export async function confirmedDatesBetween(fromYmd: string, toYmdExclusive: string): Promise<{ field: ExtractedField; item: InboxItem }[]> {
   const db = await getDb();
   const rows = await db.getAllAsync<FieldRow & { item_title: string }>(

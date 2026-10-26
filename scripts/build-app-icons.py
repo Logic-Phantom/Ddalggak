@@ -68,5 +68,37 @@ def main() -> None:
     print(f'icons written to {OUT}')
 
 
+def build_store_assets() -> None:
+    """Google Play listing graphics: 512x512 icon and 1024x500 feature graphic (no alpha)."""
+    from PIL import ImageFont
+
+    store = ROOT / 'docs' / 'store' / 'assets'
+    store.mkdir(parents=True, exist_ok=True)
+    white = (255, 255, 255, 255)
+    render(512, ACCENT, white, 1.0).convert('RGB').save(store / 'play-icon-512.png')
+
+    w, h = 1024, 500
+    bg = Image.new('RGB', (w, h))
+    d = ImageDraw.Draw(bg)
+    for y in range(h):
+        t = y / h
+        d.line([(0, y), (w, y)], fill=tuple(round(a + (b - a) * t) for a, b in zip(ACCENT, ACCENT_DEEP)))
+    glyph = 340
+    bg.paste(Image.new('RGB', (glyph, glyph), (255, 255, 255)), (70, (h - glyph) // 2), glyph_mask(glyph * SS).resize((glyph, glyph), Image.LANCZOS))
+    fonts = ROOT / 'assets' / 'fonts'
+    title = ImageFont.truetype(str(fonts / 'Pretendard-Bold.otf'), 118)
+    tagline = ImageFont.truetype(str(fonts / 'Pretendard-SemiBold.otf'), 44)
+    note = ImageFont.truetype(str(fonts / 'Pretendard-Medium.otf'), 30)
+    x = 470
+    d.text((x, 92), '딸깍', font=title, fill=(255, 255, 255))
+    d.text((x, 252), '저장한 정보를, 딸깍 한 번에.', font=tagline, fill=(255, 255, 255))
+    d.text((x, 330), '공유하면 모이고, 기한은 알림으로', font=note, fill=(214, 225, 255))
+    d.text((x, 374), '로그인 없이 기기 안에만 저장', font=note, fill=(214, 225, 255))
+    bg.save(store / 'feature-graphic-1024x500.png')
+    print(f'store assets written to {store}')
+
+
 if __name__ == '__main__':
-    main()
+    import sys
+
+    build_store_assets() if '--store' in sys.argv else main()

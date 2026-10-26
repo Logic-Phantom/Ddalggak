@@ -6,6 +6,12 @@
       "runtimeExecutable": "npx.cmd",
       "runtimeArgs": ["expo", "start", "--web", "--port", "8082"],
       "port": 8082
+    },
+    {
+      "name": "ddalggak-web-mac",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["expo", "start", "--web", "--port", "8082"],
+      "port": 8082
     }
   ]
 }

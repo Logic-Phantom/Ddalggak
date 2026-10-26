@@ -71,16 +71,20 @@ npm run lint
 ## 프로젝트 구조
 
 ```
-src/app/             화면 (인박스·검색·기한·설정 탭, capture, item, category, archive, privacy)
+src/app/             화면 (홈·보관함·+·알림·마이 탭, capture, item, search, settings, privacy, licenses)
 src/components/      InboxItemRow, ItemEditor, ExtractedFieldRow, ReminderSheet
 src/design-system/   토큰과 공용 컴포넌트
 src/domain/          모델·분류 라벨·오류
 src/features/        incoming-share, capture, ocr, extraction, items, reminders, search, export-import, preferences
 src/infrastructure/  SQLite, 파일 저장소, 로컬 알림 (+ 웹 대체 구현)
+src/generated/       오픈소스 고지 목록 (scripts/license-audit.mjs가 생성)
 tests/               unit, share-intent, extraction-fixtures(가상 텍스트)
 scripts/             앱 아이콘 생성, 라이선스 감사, Android 기기 QA
-docs/                아키텍처·결정·POC·개인정보·위협 모델·라이선스·비용·테스트·로드맵
+docs/                아키텍처·결정·POC·개인정보·위협 모델·라이선스·비용·테스트·로드맵·출시
+docs/store/          Play 등록정보 원고, 정책 답변, 처리방침(웹 게시용), 스토어 그래픽
 ```
+
+출시: [RELEASE_CHECKLIST](docs/RELEASE_CHECKLIST.md) · [스토어 등록정보](docs/store/PLAY_STORE_LISTING.md) · [Play Console 답변](docs/store/PLAY_CONSOLE_FORMS.md) · [개인정보 처리방침](docs/store/PRIVACY_POLICY.md)
 
 자세한 내용: [ARCHITECTURE](docs/ARCHITECTURE.md) · [DECISIONS](docs/DECISIONS.md) · [DATA_MODEL](docs/DATA_MODEL.md) · [PRIVACY](docs/PRIVACY.md) · [THREAT_MODEL](docs/THREAT_MODEL.md) · [LICENSES](docs/LICENSES_AND_COPYRIGHT.md) · [COSTS](docs/APP_STORE_AND_COSTS.md) · [BRAND](docs/BRAND_AND_TRADEMARKS.md) · [TESTING](docs/TESTING.md) · [ROADMAP](docs/ROADMAP.md)
 
@@ -202,3 +206,28 @@ docs/                아키텍처·결정·POC·개인정보·위협 모델·라
 **실행한 명령과 결과**
 - `npx jest` — 124 통과 / 0 실패, `npx tsc --noEmit` — 통과, `npx expo lint` — 통과
 - 실기기 기능 테스트(공유 수신·사진/파일 선택·알림): **미실행** — 사용자가 APK로 직접 확인 예정
+
+### 2026-10-26 — 출시 전 검토 (Google Play 1.0.0 준비)
+
+**환경**: macOS(Darwin 24.6), Node 24.22.0, npm 11.19.1. 저장소를 새로 받아 `npm install`.
+
+**고친 것** (자세한 표: `docs/RELEASE_CHECKLIST.md` 3장)
+- 앱 종료 상태에서 알림을 누르면 항목이 안 열리던 문제 → 마지막 알림 응답을 한 번 읽고 지움.
+- 재예약된 알림 제목이 항목 제목 대신 라벨로 표시 → 항목 제목 사용.
+- 없어진 "기한 탭"을 가리키던 문구 → "알림 탭".
+- 버전 하드코딩 제거, `1.0.0`으로 올림. 지원 이메일·처리방침 URL은 `app.json` `extra`에서 읽음(D-015).
+- 개인정보 화면을 실제 처리방침으로 교체, 오픈소스 라이선스 화면 추가(D-016).
+- `WRITE_EXTERNAL_STORAGE`, `AD_ID` 권한 차단(D-017). 스플래시 배경을 현재 토큰에 맞춤. `eas.json` 제출 트랙 internal/draft.
+
+**만든 것**: `docs/RELEASE_CHECKLIST.md`, `docs/store/PLAY_STORE_LISTING.md`(이름·설명·출시 노트·스크린샷 목록), `docs/store/PLAY_CONSOLE_FORMS.md`(데이터 보안·콘텐츠 등급·타겟층·권한), `docs/store/PRIVACY_POLICY.md` + `privacy-policy.html`, `docs/store/assets/`(512 아이콘·1024×500 그래픽, `python scripts/build-app-icons.py --store`).
+
+**실행한 명령과 결과**
+- `npx tsc --noEmit` 통과 · `npx expo lint` 통과 · `npx jest` 127/127 · `npx expo-doctor` 20/20
+- `npx expo prebuild --platform android --no-install`로 매니페스트 확인(targetSdk 36, 차단 권한 제거 확인) 후 생성 폴더 삭제
+- `npx expo export --platform android --source-maps` + `node scripts/license-audit.mjs` → 68개, 허용 목록 밖 0개
+- `npm audit --omit=dev`: high 5건 모두 `@expo/cli`(빌드 도구)의 node-forge·zod — 앱 번들 미포함, `--force`(SDK 54로 내려감)는 하지 않음
+- 웹 프리뷰에서 마이·처리방침·오픈소스 라이선스 화면 확인
+
+**미검증**: 알림 수정 2건은 실기기 미확인(웹은 알림 미지원). 새 APK/AAB 빌드·설치 안 함.
+
+**남은 일(계정 소유자)**: 지원 이메일, 처리방침 게시 URL, 휴대전화 스크린샷, 비공개 테스트(신규 개인 계정 요건), 상표 확인 → `docs/RELEASE_CHECKLIST.md` 1장.

@@ -2,7 +2,7 @@
   "expo": {
     "name": "딸깍",
     "slug": "ddalggak",
-    "version": "0.1.0",
+    "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "ddalggak",
@@ -32,7 +32,9 @@
         "android.permission.READ_MEDIA_AUDIO",
         "android.permission.READ_MEDIA_VISUAL_USER_SELECTED",
         "android.permission.READ_CONTACTS",
-        "android.permission.SYSTEM_ALERT_WINDOW"
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "com.google.android.gms.permission.AD_ID"
       ]
     },
     "web": {
@@ -48,11 +50,11 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#F6F7F9",
+          "backgroundColor": "#F5F8F7",
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 120,
           "dark": {
-            "backgroundColor": "#101114",
+            "backgroundColor": "#0E1311",
             "image": "./assets/images/splash-icon.png"
           }
         }
@@ -105,6 +107,8 @@
       "reactCompiler": true
     },
     "extra": {
+      "privacyPolicyUrl": "",
+      "supportEmail": "",
       "router": {
         "asyncRoutes": {
           "web": true

@@ -38,7 +38,10 @@ typescript 6.0.3 (Apache-2.0), jest / jest-expo (MIT), eslint (MIT).
 - 테스트 fixture는 전부 직접 작성한 가상 텍스트(`tests/extraction-fixtures/fixtures.json`). 실제 영수증·대화·계정 화면은 저장소에 넣지 않음.
 - `docs/screenshots/`는 웹 프리뷰 화면(가상 데이터)만.
 
+## 감사 결과 (2026-10-26)
+- `npx expo export --platform android --source-maps` → `node scripts/license-audit.mjs <map>`: 번들 포함 **68개** — MIT 65, ISC 1(`@ungap/structured-clone`), MIT AND Apache-2.0 1(`@expo-google-fonts/material-symbols`), OFL-1.1 1(Pretendard). 허용 목록 밖 0개.
+- 결과는 `src/generated/oss-licenses.json` → 앱 마이 > 오픈소스 라이선스 화면에 표시(D-016).
+
 ## 미해결
-- 전체 의존성 트리 라이선스 감사 미실행(`npx expo export --platform android --source-maps` 후 `node scripts/license-audit.mjs <map>`).
-- 앱 내 오픈소스 고지 화면 미구현.
+- iOS Pod / Android Gradle 네이티브 의존성(AndroidX, Firebase Messaging 등)의 라이선스는 위 감사 범위 밖 — 대부분 Apache-2.0이지만 별도 확인 필요.
 - 저장소 자체 LICENSE 미정(D-011).

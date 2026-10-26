@@ -70,7 +70,8 @@ export default function RootLayout() {
             <Stack.Screen name="item/edit/[id]" options={{ title: '수정하기' }} />
             <Stack.Screen name="search" options={{ title: '검색' }} />
             <Stack.Screen name="settings" options={{ title: '저장·데이터 설정' }} />
-            <Stack.Screen name="privacy" options={{ title: '개인정보와 데이터' }} />
+            <Stack.Screen name="privacy" options={{ title: '개인정보 처리방침' }} />
+            <Stack.Screen name="licenses" options={{ title: '오픈소스 라이선스' }} />
           </Stack>
         </AppStateProvider>
       </ThemeProvider>
