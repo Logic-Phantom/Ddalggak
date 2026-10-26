@@ -2,7 +2,7 @@ import { useRouter } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { AppText, BRAND_NAME, BRAND_TAGLINE, BrandMark, PrimaryButton, fonts, spacing, useColors } from '@/design-system';
+import { AppText, BRAND_NAME, BRAND_NAME_EN, BRAND_TAGLINE, BrandMark, PrimaryButton, fonts, spacing, useColors } from '@/design-system';
 import { useAppState } from '@/hooks/app-state';
 
 const POINTS = [
@@ -24,11 +24,14 @@ export default function OnboardingScreen() {
   };
 
   return (
-    <View style={[styles.wrap, { backgroundColor: c.accentSoft, paddingTop: insets.top + spacing.xxl, paddingBottom: insets.bottom + spacing.lg }]}>
+    <View style={[styles.wrap, { backgroundColor: c.background, paddingTop: insets.top + spacing.xxl, paddingBottom: insets.bottom + spacing.lg }]}>
       <View style={styles.center}>
         <BrandMark size={84} />
-        <AppText accessibilityRole="header" style={{ fontFamily: fonts.bold, fontSize: 40, lineHeight: 48, letterSpacing: -1, color: c.textPrimary }} maxFontSizeMultiplier={1.3}>
+        <AppText accessibilityRole="header" style={{ fontFamily: fonts.bold, fontSize: 40, lineHeight: 48, letterSpacing: -1, color: c.accent }} maxFontSizeMultiplier={1.3}>
           {BRAND_NAME}
+        </AppText>
+        <AppText style={{ fontFamily: fonts.semibold, fontSize: 18, color: c.brandMint }} maxFontSizeMultiplier={1.3} accessibilityElementsHidden importantForAccessibility="no">
+          {BRAND_NAME_EN}
         </AppText>
         <AppText variant="body" tone="secondary" align="center">{BRAND_TAGLINE}</AppText>
       </View>

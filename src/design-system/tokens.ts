@@ -1,7 +1,8 @@
 /**
- * KeepOn design tokens — "Calm Personal Inbox", deep-green edition (2026-10-24 redesign).
- * Near-white mint background, white rounded cards, deep green for primary actions,
- * pastel circles per category. Status always pairs color with an icon and text.
+ * 킵온 (KeepOn) design tokens — "Calm Personal Inbox", teal-green edition (2026-10-26 restyle).
+ * Near-white mint background, white rounded cards with soft green shadows, teal-green for
+ * primary actions and filled pill segments, pastel rounded squares per category, mint brand accent.
+ * Status always pairs color with an icon and text.
  * Rules: docs/DESIGN_SYSTEM.md. Screens must not define their own colors/spacings.
  */
 
@@ -21,6 +22,8 @@ export interface ColorTokens {
   accentSoft: string;
   /** Accent used as text on light surfaces (≥ 4.5:1). */
   accentText: string;
+  /** Brand mint (wordmark "KeepOn", small highlights). Decorative — not for body text. */
+  brandMint: string;
   selected: string;
   selectedText: string;
   success: string;
@@ -33,25 +36,26 @@ export interface ColorTokens {
 }
 
 export const lightColors: ColorTokens = {
-  background: '#F5F8F7',
+  background: '#F6FAF8',
   surface: '#FFFFFF',
   surfaceElevated: '#FFFFFF',
-  surfaceSunken: '#EDF2F0',
-  textPrimary: '#16201D',
-  textSecondary: '#55605C',
-  textTertiary: '#7E8884',
+  surfaceSunken: '#EEF4F1',
+  textPrimary: '#15211D',
+  textSecondary: '#53625D',
+  textTertiary: '#7C8A85',
   textOnAccent: '#FFFFFF',
-  border: '#E2E8E5',
-  borderStrong: '#CBD4D0',
-  // Deep green: white text on it ≈ 11:1.
-  accent: '#1F3D36',
-  accentPressed: '#152C27',
-  accentSoft: '#E4F1EB',
-  accentText: '#1E6B4E',
-  selected: '#1F3D36',
+  border: '#E3ECE8',
+  borderStrong: '#C9D6D1',
+  // Teal green: white text on it ≈ 7.6:1.
+  accent: '#1F5B4F',
+  accentPressed: '#174A40',
+  accentSoft: '#E3F5EE',
+  accentText: '#1E6B57',
+  brandMint: '#4CAB94',
+  selected: '#1F5B4F',
   selectedText: '#FFFFFF',
-  success: '#1E7A4C',
-  successSoft: '#E4F3EA',
+  success: '#2A7D66',
+  successSoft: '#E6F7F0',
   warning: '#8A5A00',
   warningSoft: '#FBF1DC',
   error: '#C0352B',
@@ -74,6 +78,7 @@ export const darkColors: ColorTokens = {
   accentPressed: '#7AC3A3',
   accentSoft: '#183028',
   accentText: '#9FDCC0',
+  brandMint: '#7CCFB8',
   selected: '#8FD3B4',
   selectedText: '#0B1A15',
   success: '#5CC58F',
@@ -85,7 +90,7 @@ export const darkColors: ColorTokens = {
   scrim: 'rgba(0,0,0,0.65)',
 };
 
-/** Pastel circle tones for category icons (bg = circle, fg = icon). Icon + label, never color alone. */
+/** Pastel tile tones for category icons (bg = rounded square, fg = icon). Icon + label, never color alone. */
 export type CategoryToneName = 'green' | 'orange' | 'blue' | 'purple' | 'pink' | 'teal' | 'yellow' | 'gray' | 'indigo';
 export const categoryTones: Record<'light' | 'dark', Record<CategoryToneName, { bg: string; fg: string }>> = {
   light: {
@@ -124,17 +129,20 @@ export const spacing = {
 
 export const radius = {
   photo: 10,
-  tile: 14,
+  tile: 16,
   chip: 999,
   /** Text fields, inline messages, buttons. */
   button: 14,
-  card: 18,
+  card: 20,
   sheet: 24,
 } as const;
 
+/** Category icon tiles are rounded squares: corner = size × this. */
+export const tileCornerRatio = 0.32;
+
 export const elevation = {
-  raised: { shadowColor: '#0F1A33', shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: 5 }, elevation: 3 },
-  card: { shadowColor: '#0F1A33', shadowOpacity: 0.04, shadowRadius: 10, shadowOffset: { width: 0, height: 2 }, elevation: 1 },
+  raised: { shadowColor: '#1F5B4F', shadowOpacity: 0.16, shadowRadius: 16, shadowOffset: { width: 0, height: 6 }, elevation: 4 },
+  card: { shadowColor: '#1F5B4F', shadowOpacity: 0.06, shadowRadius: 14, shadowOffset: { width: 0, height: 4 }, elevation: 1 },
 } as const;
 
 /**

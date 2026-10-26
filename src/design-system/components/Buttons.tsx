@@ -81,12 +81,14 @@ export interface IconButtonProps {
   active?: boolean;
   tone?: 'default' | 'danger' | 'onPhoto';
   size?: number;
+  /** Smaller visual box for dense rows; the tap area stays ≥ 44pt through hitSlop. */
+  compact?: boolean;
   children?: ReactNode;
   testID?: string;
 }
 
 /** Icon-only button: always carries an accessibility label; min 44pt target. */
-export function IconButton({ icon, label, onPress, disabled, active, tone = 'default', size = 22, testID }: IconButtonProps) {
+export function IconButton({ icon, label, onPress, disabled, active, tone = 'default', size = 22, compact, testID }: IconButtonProps) {
   const c = useColors();
   const color = tone === 'danger' ? c.error : tone === 'onPhoto' ? '#FFFFFF' : active ? c.accent : c.textPrimary;
   return (
@@ -94,12 +96,13 @@ export function IconButton({ icon, label, onPress, disabled, active, tone = 'def
       testID={testID}
       onPress={onPress}
       disabled={disabled}
-      hitSlop={6}
+      hitSlop={compact ? 10 : 6}
       accessibilityRole="button"
       accessibilityLabel={label}
       accessibilityState={{ disabled: !!disabled, selected: !!active }}
       style={({ pressed }) => [
         styles.icon,
+        compact && styles.iconCompact,
         tone === 'onPhoto' && { backgroundColor: 'rgba(0,0,0,0.45)' },
         pressed && { opacity: 0.6 },
         disabled && { opacity: 0.35 },
@@ -122,4 +125,5 @@ const styles = StyleSheet.create({
   compact: { minHeight: touchTarget, paddingHorizontal: spacing.md, paddingVertical: spacing.xs },
   row: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
   icon: { minWidth: touchTarget, minHeight: touchTarget, alignItems: 'center', justifyContent: 'center', borderRadius: touchTarget / 2 },
+  iconCompact: { minWidth: 32, minHeight: 32, borderRadius: 16 },
 });

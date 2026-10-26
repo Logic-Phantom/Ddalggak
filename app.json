@@ -17,7 +17,7 @@
     "android": {
       "package": "app.ddalggak.mobile",
       "adaptiveIcon": {
-        "backgroundColor": "#2F5BD3",
+        "backgroundColor": "#165D4C",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
@@ -42,15 +42,15 @@
       "favicon": "./assets/images/favicon.png",
       "name": "킵온",
       "shortName": "킵온",
-      "themeColor": "#2F5BD3",
-      "backgroundColor": "#F6F7F9"
+      "themeColor": "#1F5B4F",
+      "backgroundColor": "#F6FAF8"
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#F5F8F7",
+          "backgroundColor": "#F6FAF8",
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 120,
           "dark": {
@@ -95,7 +95,7 @@
       [
         "expo-notifications",
         {
-          "color": "#2F5BD3"
+          "color": "#1F5B4F"
         }
       ],
       "expo-sqlite",

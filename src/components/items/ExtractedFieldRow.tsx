@@ -1,4 +1,5 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
+import * as Clipboard from 'expo-clipboard';
 import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
@@ -68,89 +69,111 @@ export function ExtractedFieldRow({ field, onConfirm, onEdit, onDelete, maskByDe
     setEditing(false);
   };
 
+  const [copied, setCopied] = useState(false);
+  const copy = () =>
+    // Clipboard is written only on this explicit tap; the real value is copied even while masked.
+    Clipboard.setStringAsync(field.valueText)
+      .then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1800);
+      })
+      .catch(() => {});
+
   return (
-    <View style={[styles.wrap, { borderColor: needsLook ? c.warning : c.border, backgroundColor: c.surface }]}>
-      <View style={styles.head}>
-        <View style={{ flex: 1, gap: 2 }}>
-          <AppText variant="caption" tone="secondary">{label}</AppText>
-          {!editing ? (
-            <AppText variant={field.fieldType === 'date' || field.fieldType === 'amount' ? 'numeric' : 'body'} selectable={!sensitive || revealed}>
-              {shown}
-            </AppText>
-          ) : null}
-        </View>
-        {sensitive && !editing ? <IconButton icon={revealed ? 'eye-off-outline' : 'eye-outline'} label={revealed ? `${label} 가리기` : `${label} 보기`} onPress={() => setRevealed((v) => !v)} size={20} /> : null}
+    <View style={styles.row}>
+      <View style={[styles.labelPill, { backgroundColor: needsLook ? c.warningSoft : c.surfaceSunken }]}>
+        <AppText variant="caption" style={{ color: needsLook ? c.warning : c.textSecondary, fontWeight: '600' }}>{label}</AppText>
       </View>
 
-      {editing ? (
-        <View style={{ gap: spacing.xs }}>
-          <TextField
-            label={`${label} 수정`}
-            value={draft}
-            onChangeText={setDraft}
-            error={error}
-            keyboardType={field.fieldType === 'amount' ? 'numbers-and-punctuation' : 'default'}
-            autoFocus
-            hint={field.fieldType === 'date' ? '형식: 2026-10-31 또는 2026-10-31 18:00' : undefined}
-          />
-          {field.fieldType === 'date' ? (
-            <View style={{ gap: spacing.xxs }}>
-              <AppText variant="caption" tone="secondary">이 날짜의 의미</AppText>
-              <Row wrap gap={spacing.xs}>
-                {EDITABLE_ROLES.map((r) => (
-                  <FilterChip key={r} role="radio" label={DATE_ROLE_LABEL[r]} selected={(role ?? 'unknown') === r} onPress={() => setRole(r)} />
-                ))}
-              </Row>
-            </View>
-          ) : null}
-          <Row gap={spacing.xs}>
-            <PrimaryButton compact label="저장" onPress={save} style={{ flex: 1 }} />
-            <GhostButton compact label="취소" onPress={() => setEditing(false)} />
-          </Row>
-        </View>
-      ) : (
-        <Row wrap gap={spacing.xs}>
-          <ConfidenceBadge level={field.userConfirmed ? 'high' : field.confidence} />
-          {field.userEditedAt ? <AppText variant="caption" tone="tertiary">직접 수정함</AppText> : null}
-          {field.method === 'ocr' ? <AppText variant="caption" tone="tertiary">이미지에서 읽음</AppText> : null}
-        </Row>
-      )}
+      <View style={{ flex: 1, gap: spacing.xxs }}>
+        {!editing ? (
+          <View style={styles.valueRow}>
+            {field.fieldType === 'date' ? <Ionicons name="calendar-outline" size={17} color={c.textSecondary} /> : null}
+            <AppText variant={field.fieldType === 'date' || field.fieldType === 'amount' ? 'numeric' : 'bodyStrong'} selectable={!sensitive || revealed} style={{ flexShrink: 1 }}>
+              {shown}
+            </AppText>
+            {field.userConfirmed ? (
+              onConfirm ? (
+                <Pressable onPress={() => onConfirm(false)} accessibilityRole="button" accessibilityLabel={`${label} 확인함, 눌러서 확인 취소`} hitSlop={10} style={styles.check}>
+                  <Ionicons name="checkmark-circle" size={20} color={c.success} />
+                </Pressable>
+              ) : (
+                <Ionicons name="checkmark-circle" size={18} color={c.success} accessibilityLabel="확인함" />
+              )
+            ) : null}
+            <View style={{ flex: 1 }} />
+            {sensitive ? <IconButton icon={revealed ? 'eye-off-outline' : 'eye-outline'} label={revealed ? `${label} 가리기` : `${label} 보기`} onPress={() => setRevealed((v) => !v)} size={19} compact /> : null}
+            {sensitive ? <IconButton icon={copied ? 'checkmark' : 'copy-outline'} label={copied ? `${label} 복사함` : `${label} 복사`} onPress={copy} size={18} compact /> : null}
+          </View>
+        ) : null}
 
-      {!editing && field.evidenceText ? (
-        <View style={{ gap: spacing.xxs }}>
-          <Pressable onPress={() => setShowEvidence((v) => !v)} accessibilityRole="button" accessibilityState={{ expanded: showEvidence }} accessibilityLabel="근거 보기" style={styles.evidenceToggle}>
-            <Ionicons name={showEvidence ? 'chevron-up' : 'chevron-down'} size={16} color={c.textSecondary} />
-            <AppText variant="caption" tone="secondary">근거 보기</AppText>
-          </Pressable>
-          {showEvidence ? (
-            <View style={[styles.evidence, { backgroundColor: c.surfaceSunken }]}>
-              <AppText variant="secondary" tone="secondary">“{sensitive && !revealed ? '(가려짐)' : field.evidenceText}”</AppText>
-            </View>
-          ) : null}
-        </View>
-      ) : null}
-
-      {!editing && (onConfirm || onEdit || onDelete) ? (
-        <Row wrap gap={spacing.xs}>
-          {onConfirm ? (
-            <FilterChip
-              label={field.userConfirmed ? '확인함' : '이 값이 맞아요'}
-              selected={field.userConfirmed}
-              onPress={() => onConfirm(!field.userConfirmed)}
-              testID={`confirm-${field.id}`}
+        {editing ? (
+          <View style={{ gap: spacing.xs }}>
+            <TextField
+              label={`${label} 수정`}
+              value={draft}
+              onChangeText={setDraft}
+              error={error}
+              keyboardType={field.fieldType === 'amount' ? 'numbers-and-punctuation' : 'default'}
+              autoFocus
+              hint={field.fieldType === 'date' ? '형식: 2026-10-31 또는 2026-10-31 18:00' : undefined}
             />
-          ) : null}
-          {onEdit ? <GhostButton compact icon="create-outline" label="수정" onPress={startEdit} /> : null}
-          {onDelete ? <GhostButton compact icon="trash-outline" label="삭제" onPress={onDelete} /> : null}
-        </Row>
-      ) : null}
+            {field.fieldType === 'date' ? (
+              <View style={{ gap: spacing.xxs }}>
+                <AppText variant="caption" tone="secondary">이 날짜의 의미</AppText>
+                <Row wrap gap={spacing.xs}>
+                  {EDITABLE_ROLES.map((r) => (
+                    <FilterChip key={r} role="radio" label={DATE_ROLE_LABEL[r]} selected={(role ?? 'unknown') === r} onPress={() => setRole(r)} />
+                  ))}
+                </Row>
+              </View>
+            ) : null}
+            <Row gap={spacing.xs}>
+              <PrimaryButton compact label="저장" onPress={save} style={{ flex: 1 }} />
+              <GhostButton compact label="취소" onPress={() => setEditing(false)} />
+            </Row>
+          </View>
+        ) : (
+          <Row wrap gap={spacing.xs}>
+            {field.userConfirmed ? null : <ConfidenceBadge level={field.confidence} />}
+            {field.userEditedAt ? <AppText variant="caption" tone="tertiary">직접 수정함</AppText> : null}
+            {field.method === 'ocr' ? <AppText variant="caption" tone="tertiary">이미지에서 읽음</AppText> : null}
+          </Row>
+        )}
+
+        {!editing && field.evidenceText ? (
+          <View style={{ gap: spacing.xxs }}>
+            <Pressable onPress={() => setShowEvidence((v) => !v)} accessibilityRole="button" accessibilityState={{ expanded: showEvidence }} accessibilityLabel="근거 보기" style={styles.evidenceToggle}>
+              <Ionicons name={showEvidence ? 'chevron-up' : 'chevron-down'} size={16} color={c.textSecondary} />
+              <AppText variant="caption" tone="secondary">근거 보기</AppText>
+            </Pressable>
+            {showEvidence ? (
+              <View style={[styles.evidence, { backgroundColor: c.surfaceSunken }]}>
+                <AppText variant="secondary" tone="secondary">“{sensitive && !revealed ? '(가려짐)' : field.evidenceText}”</AppText>
+              </View>
+            ) : null}
+          </View>
+        ) : null}
+
+        {!editing && ((onConfirm && !field.userConfirmed) || onEdit || onDelete) ? (
+          <Row wrap gap={spacing.xs}>
+            {onConfirm && !field.userConfirmed ? (
+              <FilterChip label="이 값이 맞아요" selected={false} onPress={() => onConfirm(true)} testID={`confirm-${field.id}`} />
+            ) : null}
+            {onEdit ? <GhostButton compact icon="create-outline" label="수정" onPress={startEdit} /> : null}
+            {onDelete ? <GhostButton compact icon="trash-outline" label="삭제" onPress={onDelete} /> : null}
+          </Row>
+        ) : null}
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  wrap: { borderWidth: 1, borderRadius: radius.tile, padding: spacing.sm, gap: spacing.xs },
-  head: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.xs },
+  row: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.sm, paddingHorizontal: spacing.md, paddingVertical: spacing.sm },
+  labelPill: { width: 76, minHeight: 32, borderRadius: radius.button, paddingHorizontal: spacing.xs, alignItems: 'center', justifyContent: 'center', marginTop: 4 },
+  check: { minWidth: 32, minHeight: 32, alignItems: 'center', justifyContent: 'center' },
+  valueRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.xxs, minHeight: 40 },
   evidenceToggle: { flexDirection: 'row', alignItems: 'center', gap: 4, minHeight: 32, alignSelf: 'flex-start' },
   evidence: { borderRadius: radius.button, padding: spacing.sm },
 });

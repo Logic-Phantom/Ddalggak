@@ -1,6 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
-import { Linking, StyleSheet, View } from 'react-native';
+import { Alert, Linking, StyleSheet, View } from 'react-native';
 
 import { AppText, BrandMark, Card, Divider, ListRow, ScreenScroll, elevation, radius, spacing, useColors } from '@/design-system';
 import { confirmedDatesBetween, countByStatus } from '@/features/items/item-repository';
@@ -14,10 +14,13 @@ function Stat({ label, value, tone }: { label: string; value: number | string; t
   return (
     <View style={styles.stat} accessible accessibilityLabel={`${label} ${value}`}>
       <AppText variant="caption" tone="tertiary">{label}</AppText>
-      <AppText variant="title" style={{ color: tone === 'error' ? c.error : c.textPrimary }}>{value}</AppText>
+      <AppText variant="title" style={{ color: tone === 'error' ? c.error : c.accent }}>{value}</AppText>
     </View>
   );
 }
+
+const HELP =
+  '다른 앱에서 공유 버튼을 누르고 ‘킵온’을 고르면 바로 저장돼요. 처음에는 목록 끝의 ‘더보기’ 안에 있을 수 있어요.\n\n찾은 날짜·금액은 후보예요. ‘이 값이 맞아요’를 누른 날짜로만 알림을 만들 수 있어요.\n\n모든 정보는 이 기기 안에만 저장돼요. 기기를 바꿀 때는 설정 > 내보내기를 이용해 주세요.';
 
 /** 마이페이지: local-only profile (no account), stats and settings menu. */
 export default function MeScreen() {
@@ -54,7 +57,7 @@ export default function MeScreen() {
       <Card padded={false}>
         <ListRow icon="notifications-outline" label="알림·기한" onPress={() => router.push('/reminders')} />
         <Divider inset={spacing.md} />
-        <ListRow icon="folder-open-outline" label="완료·보관한 항목" value={data ? `${data.counts.completed + data.counts.archived}개` : undefined} onPress={() => router.push('/library')} />
+        <ListRow icon="folder-open-outline" label="보관함" value={data ? `완료·보관 ${data.counts.completed + data.counts.archived}개` : undefined} onPress={() => router.push('/library')} />
         <Divider inset={spacing.md} />
         <ListRow icon="settings-outline" label="저장·데이터 설정" onPress={() => router.push('/settings')} />
         <Divider inset={spacing.md} />
@@ -69,13 +72,8 @@ export default function MeScreen() {
         ) : null}
       </Card>
 
-      <Card>
-        <View style={{ gap: spacing.xxs }}>
-          <AppText variant="label">도움말</AppText>
-          <AppText variant="secondary" tone="secondary">
-            다른 앱에서 공유 버튼 → ‘킵온’을 고르세요. 처음에는 목록 끝의 ‘더보기’ 안에 있을 수 있어요.
-          </AppText>
-        </View>
+      <Card padded={false}>
+        <ListRow icon="help-circle-outline" label="도움말" value="공유 메뉴에서 킵온 찾기" onPress={() => Alert.alert('도움말', HELP)} />
       </Card>
 
       <AppText variant="caption" tone="tertiary" align="center">
@@ -88,7 +86,7 @@ export default function MeScreen() {
 const styles = StyleSheet.create({
   profile: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   avatar: { width: 56, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center' },
-  stats: { flexDirection: 'row', borderWidth: 1, borderRadius: radius.card, paddingVertical: spacing.md },
+  stats: { flexDirection: 'row', borderWidth: StyleSheet.hairlineWidth, borderRadius: radius.card, paddingVertical: spacing.md },
   stat: { flex: 1, alignItems: 'center', gap: 2 },
   sep: { width: StyleSheet.hairlineWidth },
 });

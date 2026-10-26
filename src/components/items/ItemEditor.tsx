@@ -7,6 +7,7 @@ import {
   BottomBar,
   Card,
   CategoryIcon,
+  Divider,
   FilterChip,
   GhostButton,
   InlineMessage,
@@ -19,6 +20,7 @@ import {
   elevation,
   radius,
   spacing,
+  tileCornerRatio,
   useCategoryTone,
   useColors,
   type IconName,
@@ -54,9 +56,7 @@ function SummaryCard({ item, title, category }: { item: ItemDetail; title: strin
       {image ? (
         <Image source={{ uri: image.localUri }} style={styles.summaryThumb} contentFit="cover" accessible={false} />
       ) : (
-        <View style={[styles.summaryThumb, { backgroundColor: tone.bg, alignItems: 'center', justifyContent: 'center' }]}>
-          <CategoryIcon category={category} size={48} />
-        </View>
+        <CategoryIcon category={category} size={60} />
       )}
       <View style={{ flex: 1, gap: 2 }}>
         <AppText variant="caption" style={{ color: tone.fg }}>{CATEGORY_INFO[category].label}</AppText>
@@ -68,8 +68,8 @@ function SummaryCard({ item, title, category }: { item: ItemDetail; title: strin
 }
 
 const styles = StyleSheet.create({
-  summary: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, padding: spacing.sm, borderWidth: 1, borderRadius: radius.card },
-  summaryThumb: { width: 72, height: 72, borderRadius: radius.tile },
+  summary: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, padding: spacing.md, borderWidth: StyleSheet.hairlineWidth, borderRadius: radius.card },
+  summaryThumb: { width: 60, height: 60, borderRadius: Math.round(60 * tileCornerRatio) },
 });
 
 export interface ItemEditorProps {
@@ -202,19 +202,25 @@ export function ItemEditor({ item, mode, reload, onSaved, onCancel, notices }: I
 
         <View style={{ gap: spacing.sm }}>
           <SectionHeader
-            title="찾은 정보"
+            title="추출된 정보"
             subtitle={ordered.length ? '자동으로 찾은 값은 후보예요. 맞는 값만 확인해 주세요.' : '찾은 값이 없어요. 필요한 정보를 직접 추가할 수 있어요.'}
           />
-          {ordered.map((f) => (
-            <ExtractedFieldRow
-              key={f.id}
-              field={f}
-              maskByDefault={mode === 'edit'}
-              onConfirm={(v) => run(() => updateField(f.id, { userConfirmed: v }))}
-              onEdit={(e) => run(() => updateField(f.id, { ...e, userConfirmed: true, edited: true }))}
-              onDelete={() => confirmDelete(f)}
-            />
-          ))}
+          {ordered.length ? (
+            <Card padded={false}>
+              {ordered.map((f, i) => (
+                <View key={f.id}>
+                  {i ? <Divider inset={spacing.md} /> : null}
+                  <ExtractedFieldRow
+                    field={f}
+                    maskByDefault={mode === 'edit'}
+                    onConfirm={(v) => run(() => updateField(f.id, { userConfirmed: v }))}
+                    onEdit={(e) => run(() => updateField(f.id, { ...e, userConfirmed: true, edited: true }))}
+                    onDelete={() => confirmDelete(f)}
+                  />
+                </View>
+              ))}
+            </Card>
+          ) : null}
           <Card>
             <View style={{ gap: spacing.xs }}>
               <AppText variant="label">직접 추가</AppText>

@@ -120,7 +120,7 @@ export function ProgressPanel({ steps, processed, total, failed }: { steps: Prog
 
 const styles = StyleSheet.create({
   sectionHeader: { flexDirection: 'row', alignItems: 'flex-end', gap: spacing.sm, marginBottom: spacing.xs },
-  card: { borderRadius: radius.card, borderWidth: 1 },
+  card: { borderRadius: radius.card, borderWidth: StyleSheet.hairlineWidth },
   msg: { flexDirection: 'row', gap: spacing.xs, padding: spacing.sm, borderRadius: radius.button },
   empty: { alignItems: 'center', gap: spacing.sm, paddingVertical: spacing.xxl, paddingHorizontal: spacing.lg },
   emptyIcon: { width: 64, height: 64, borderRadius: 32, alignItems: 'center', justifyContent: 'center', marginBottom: spacing.xs },

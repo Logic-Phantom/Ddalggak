@@ -1,10 +1,9 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
 import { InboxItemRow } from '@/components/inbox/InboxItemRow';
-import { AppText, BrandMark, CategoryIcon, CategoryTile, EmptyState, ErrorState, GhostButton, InlineMessage, PrimaryButton, ScreenScroll, SectionHeader, elevation, radius, spacing, useCategoryTone, useColors } from '@/design-system';
+import { AppText, BrandMark, BrandWordmark, CategoryIcon, CategoryTile, EmptyState, ErrorState, InlineMessage, ScreenScroll, SectionLink, elevation, radius, spacing, useColors } from '@/design-system';
 import { PRIMARY_CATEGORIES, fieldLabel } from '@/domain/categories';
 import type { ExtractedField, InboxItem } from '@/domain/models';
 import { firstImages, listItems, upcomingDates } from '@/features/items/item-repository';
@@ -12,9 +11,9 @@ import { useAppState } from '@/hooks/app-state';
 import { useLoader } from '@/hooks/use-loader';
 import { dDayLabel, diffDays, formatLocal, toYmd } from '@/utils/dates';
 
-function DueCard({ item, date, thumbnail, onPress }: { item: InboxItem; date: ExtractedField; thumbnail?: string; onPress: () => void }) {
+/** "다음 일정" card: category tile, date, title, date meaning and D-day. */
+function DueRow({ item, date, onPress }: { item: InboxItem; date: ExtractedField; onPress: () => void }) {
   const c = useColors();
-  const tone = useCategoryTone(item.category);
   const d = date.normalizedValue!;
   const soon = diffDays(toYmd(new Date()), d) <= 3;
   return (
@@ -22,23 +21,15 @@ function DueCard({ item, date, thumbnail, onPress }: { item: InboxItem; date: Ex
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={`${item.title}, ${fieldLabel('date', date.role)} ${formatLocal(d)}, ${dDayLabel(d)}`}
-      style={({ pressed }) => [styles.due, elevation.card, { backgroundColor: c.surface, borderColor: c.border, opacity: pressed ? 0.85 : 1 }]}>
-      {thumbnail ? (
-        <Image source={{ uri: thumbnail }} style={styles.dueImage} contentFit="cover" accessible={false} />
-      ) : (
-        <View style={[styles.dueImage, { backgroundColor: tone.bg, alignItems: 'center', justifyContent: 'center' }]}>
-          <CategoryIcon category={item.category} size={56} />
-        </View>
-      )}
-      <View style={{ padding: spacing.sm, gap: 2 }}>
-        <View style={styles.rowBetween}>
-          <AppText variant="label" numberOfLines={1} style={{ flex: 1 }}>{item.title}</AppText>
-          <AppText variant="caption" style={{ color: soon ? c.error : c.accentText, fontWeight: '700' }}>{dDayLabel(d)}</AppText>
-        </View>
-        <AppText variant="caption" tone="tertiary" numberOfLines={1}>
-          {fieldLabel('date', date.role)} · {formatLocal(d)}
-        </AppText>
+      style={({ pressed }) => [styles.due, elevation.card, { backgroundColor: pressed ? c.surfaceSunken : c.surface, borderColor: c.border }]}>
+      <CategoryIcon category={item.category} size={48} />
+      <View style={{ flex: 1, gap: 2 }}>
+        <AppText variant="meta" tone="secondary">{formatLocal(d)}</AppText>
+        <AppText variant="bodyStrong" numberOfLines={1}>{item.title}</AppText>
+        <AppText variant="caption" tone="tertiary" numberOfLines={1}>{fieldLabel('date', date.role)}</AppText>
       </View>
+      <AppText variant="caption" style={{ color: soon ? c.error : c.accentText, fontWeight: '700' }}>{dDayLabel(d)}</AppText>
+      <Ionicons name="chevron-forward" size={18} color={c.textTertiary} />
     </Pressable>
   );
 }
@@ -75,25 +66,33 @@ export default function HomeScreen() {
 
   return (
     <ScreenScroll topInset>
-      <View style={styles.rowBetween}>
-        <BrandMark size={34} />
-        <Pressable onPress={() => router.push('/search')} accessibilityRole="button" accessibilityLabel="검색" hitSlop={8} style={styles.iconBtn}>
-          <Ionicons name="search" size={22} color={c.textPrimary} />
-        </Pressable>
+      <View style={styles.header}>
+        <BrandWordmark size={26} />
+        <View style={styles.headerIcons}>
+          <Pressable onPress={() => router.push('/search')} accessibilityRole="button" accessibilityLabel="검색" hitSlop={8} style={styles.iconBtn}>
+            <Ionicons name="search-outline" size={23} color={c.textPrimary} />
+          </Pressable>
+          <Pressable onPress={() => router.push('/reminders')} accessibilityRole="button" accessibilityLabel="알림·기한" hitSlop={8} style={styles.iconBtn}>
+            <Ionicons name="notifications-outline" size={23} color={c.textPrimary} />
+          </Pressable>
+        </View>
       </View>
 
-      <AppText variant="screenTitle" accessibilityRole="header">필요한 정보,{'\n'}놓치지 않게 킵온.</AppText>
+      <View style={{ gap: spacing.sm }}>
+        <BrandMark size={36} />
+        <AppText variant="screenTitle" accessibilityRole="header">필요한 정보,{'\n'}놓치지 않게 킵온.</AppText>
+      </View>
 
       <Pressable
         onPress={() => router.push('/search')}
         accessibilityRole="search"
-        accessibilityLabel="검색어를 입력하세요"
-        style={[styles.searchPill, { backgroundColor: c.surface, borderColor: c.border }]}>
+        accessibilityLabel="저장한 정보 검색하기"
+        style={[styles.searchPill, elevation.card, { backgroundColor: c.surface, borderColor: c.border }]}>
         <Ionicons name="search-outline" size={18} color={c.textTertiary} />
-        <AppText variant="secondary" tone="tertiary">검색어를 입력하세요</AppText>
+        <AppText variant="secondary" tone="tertiary">저장한 정보 검색하기</AppText>
       </Pressable>
 
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing.sm, paddingVertical: spacing.xxs }}>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing.xs, paddingVertical: spacing.xxs }}>
         <CategoryTile category="all" onPress={() => openCategory()} />
         {PRIMARY_CATEGORIES.map((id) => (
           <CategoryTile key={id} category={id} onPress={() => openCategory(id)} />
@@ -114,13 +113,11 @@ export default function HomeScreen() {
       ) : null}
 
       {due.length ? (
-        <View style={{ gap: spacing.xs }}>
-          <SectionHeader title="다가오는 기한" subtitle="확인한 날짜 · 2주 이내" />
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing.sm, paddingBottom: spacing.xs }}>
-            {due.map((item) => (
-              <DueCard key={item.id} item={item} date={dates.get(item.id)!} thumbnail={thumbs.get(item.id)} onPress={() => openItem(item.id)} />
-            ))}
-          </ScrollView>
+        <View style={{ gap: spacing.sm }}>
+          <SectionLink title="다음 일정" onPress={() => router.push('/reminders')} />
+          {due.slice(0, 3).map((item) => (
+            <DueRow key={item.id} item={item} date={dates.get(item.id)!} onPress={() => openItem(item.id)} />
+          ))}
         </View>
       ) : null}
 
@@ -135,24 +132,23 @@ export default function HomeScreen() {
 
       {items.length ? (
         <View style={{ gap: spacing.sm }}>
-          <SectionHeader title="최근 저장" right={<GhostButton compact label="전체 보기" onPress={() => openCategory()} />} />
+          <SectionLink title="최근 저장한 정보" onPress={() => openCategory()} />
           {items.slice(0, 5).map((item) => (
             <InboxItemRow key={item.id} item={item} nextDate={dates.get(item.id)} thumbnail={thumbs.get(item.id)} onPress={() => openItem(item.id)} />
           ))}
         </View>
       ) : null}
 
-      {items.length ? <PrimaryButton icon="add" label="새 정보 추가하기" onPress={() => router.push('/capture')} /> : null}
       <AppText variant="caption" tone="tertiary" align="center">모든 정보는 이 기기 안에만 저장돼요.</AppText>
     </ScreenScroll>
   );
 }
 
 const styles = StyleSheet.create({
-  rowBetween: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: spacing.xs },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: spacing.xs },
+  headerIcons: { flexDirection: 'row', alignItems: 'center' },
   iconBtn: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
-  searchPill: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs, minHeight: 48, borderRadius: radius.chip, borderWidth: 1, paddingHorizontal: spacing.md },
+  searchPill: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs, minHeight: 50, borderRadius: radius.chip, borderWidth: StyleSheet.hairlineWidth, paddingHorizontal: spacing.md },
   banner: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs, padding: spacing.sm, borderRadius: radius.button, minHeight: 48 },
-  due: { width: 220, borderRadius: radius.card, borderWidth: 1, overflow: 'hidden' },
-  dueImage: { width: '100%', height: 110 },
+  due: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingVertical: spacing.sm, paddingHorizontal: spacing.md, borderRadius: radius.card, borderWidth: StyleSheet.hairlineWidth },
 });

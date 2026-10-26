@@ -59,7 +59,7 @@ async function clickText(text, { exact = true, nth = 0 } = {}) {
   );
   const el = handle.asElement();
   if (!el) throw new Error(`not found: ${text}`);
-  await el.scrollIntoView();
+  await el.evaluate((e) => e.scrollIntoView({ block: 'center' }));
   await sleep(150);
   await el.click();
   await sleep(600);
@@ -95,7 +95,7 @@ async function addItem(text, { confirmAll = true } = {}) {
     const ids = await page.$$eval('[data-testid^="confirm-"]', (els) => els.map((e) => e.getAttribute('data-testid')));
     for (const id of ids) {
       const el = await page.$(`[data-testid="${id}"]`);
-      await el.scrollIntoView();
+      await el.evaluate((e) => e.scrollIntoView({ block: 'center' }));
       await sleep(150);
       await el.click();
       await sleep(500);
@@ -111,6 +111,9 @@ async function addItem(text, { confirmAll = true } = {}) {
 async function addReminder(itemUrl, offsetLabel) {
   await go(itemUrl);
   await sleep(1500);
+  // The detail screen has a fixed bottom bar: bring the button to the middle before tapping.
+  await page.$eval('[data-testid="add-reminder"]', (el) => el.scrollIntoView({ block: 'center' }));
+  await sleep(300);
   await page.click('[data-testid="add-reminder"]');
   await sleep(800);
   await clickText(offsetLabel);
@@ -132,7 +135,6 @@ const coupon = await addItem('[모바일 쿠폰] 아메리카노 1잔\n쿠폰번
 const dinner = await addItem('킵온식당 예약이 확정되었어요.\n일시: 11월 2일 저녁 7시, 4명\n예약번호 R20261102');
 await addReminder(dinner, '하루 전');
 await addReminder(fest, '3일 전');
-await addReminder(coupon, '하루 전');
 
 // 01 home
 await go(BASE);

@@ -28,6 +28,7 @@ export function TextField({ label, hint, error, multiline, ...rest }: TextFieldP
           styles.input,
           multiline && styles.multiline,
           { backgroundColor: c.surface, borderColor: error ? c.error : c.border, color: c.textPrimary },
+          multiline && { lineHeight: 24 },
         ]}
         {...rest}
       />
@@ -50,5 +51,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: fonts.regular,
   },
-  multiline: { minHeight: 110, textAlignVertical: 'top', paddingTop: spacing.sm },
+  multiline: { minHeight: 140, textAlignVertical: 'top', paddingTop: spacing.sm, borderRadius: radius.card, paddingHorizontal: spacing.md },
 });

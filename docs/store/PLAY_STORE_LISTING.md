@@ -74,7 +74,7 @@
 | 자산 | 사양 (Play Console) | 파일 | 상태 |
 |---|---|---|---|
 | 앱 아이콘 | 512×512 PNG, 최대 1MB | `assets/play-icon-512.png` | ✅ 생성 (`python scripts/build-app-icons.py --store`) |
-| 그래픽 이미지(Feature graphic) | 1024×500 JPG 또는 24비트 PNG(알파 없음) | `assets/feature-graphic-1024x500.png` | ✅ 생성 |
+| 그래픽 이미지(Feature graphic) | 1024×500 JPG 또는 24비트 PNG(알파 없음) | `assets/feature-graphic-1024x500.png` | ✅ 생성 (`node scripts/store-feature-graphic.mjs`, 2026-10-26 시안 스타일) |
 | 휴대전화 스크린샷 | 2~8장, PNG/JPG, 한 변 320~3840px, **긴 변이 짧은 변의 2배 이하** | `screenshots/01~07-*.png` (1080×2160) | ✅ 웹 미리보기로 촬영 — 아래 참고 |
 | 7·10인치 태블릿 스크린샷 | 태블릿 지원을 표시할 때만 | - | 해당 없음(세로 고정 폰 UI) |
 

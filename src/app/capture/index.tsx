@@ -3,9 +3,9 @@ import * as Clipboard from 'expo-clipboard';
 import { Image } from 'expo-image';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Alert, StyleSheet, View } from 'react-native';
 
-import { AppText, BottomBar, Card, CategoryIcon, GhostButton, IconButton, InlineMessage, PrimaryButton, Row, ScreenScroll, SecondaryButton, SectionHeader, StatusBadge, TextField, elevation, radius, spacing, useColors } from '@/design-system';
+import { ActionRow, AppText, BottomBar, CategoryIcon, IconButton, InlineMessage, PrimaryButton, Row, ScreenScroll, SectionHeader, StatusBadge, TextField, elevation, radius, spacing, useColors } from '@/design-system';
 import { CATEGORY_INFO } from '@/domain/categories';
 import { messageFor, toUserMessage } from '@/domain/errors';
 import { categoryHint, classify } from '@/features/extraction/category-classifier';
@@ -153,36 +153,37 @@ export default function CaptureScreen() {
           </View>
         ) : null}
 
+        <TextField
+          label={inputs.length ? '메모나 텍스트 더하기' : '링크나 텍스트'}
+          value={text}
+          onChangeText={setText}
+          multiline
+          placeholder={'링크, 텍스트, 쿠폰, 예약 내역 등을 붙여넣어 보세요.\n예) https://map.naver.com/...\n예) 11월 2일 저녁 7시 예약, 예약번호 R1234'}
+          autoCapitalize="none"
+          testID="capture-text"
+        />
+
         <View style={{ gap: spacing.xs }}>
-          <TextField
-            label={inputs.length ? '메모나 텍스트 더하기' : '링크나 텍스트'}
-            value={text}
-            onChangeText={setText}
-            multiline
-            placeholder="예) https://map.naver.com/... 또는 '11월 2일 저녁 7시 예약, 예약번호 R1234'"
-            autoCapitalize="none"
-            testID="capture-text"
+          <AppText variant="caption" tone="tertiary">다양한 방식으로 정보를 추가할 수 있어요.</AppText>
+          <ActionRow icon="clipboard-outline" label="클립보드에서 붙여넣기" onPress={paste} />
+          <ActionRow icon="image-outline" label="사진 선택" onPress={() => addFiles(pickImages)} />
+          <ActionRow icon="document-outline" label="파일 선택" hint="PDF·이미지" onPress={() => addFiles(pickDocuments)} />
+          <ActionRow
+            icon="share-outline"
+            label="다른 앱에서 공유하기"
+            onPress={() =>
+              Alert.alert('다른 앱에서 바로 보내기', '카카오톡·브라우저·사진 앱에서 공유 버튼을 누르고 ‘킵온’을 고르면 이 화면으로 와요. 처음에는 목록 끝의 ‘더보기’ 안에 있을 수 있어요. 앱마다 보내 주는 형식이 달라서 일부는 링크나 텍스트만 전달될 수 있어요.')
+            }
           />
-          <Row gap={spacing.xs} wrap>
-            <GhostButton compact icon="clipboard-outline" label="붙여넣기" onPress={paste} />
-            <GhostButton compact icon="image-outline" label="사진 선택" onPress={() => addFiles(pickImages)} />
-            <GhostButton compact icon="document-outline" label="파일 선택 (PDF·이미지)" onPress={() => addFiles(pickDocuments)} />
-          </Row>
         </View>
 
-        <Card>
-          <View style={{ gap: spacing.xxs }}>
-            <AppText variant="label">다른 앱에서 바로 보내기</AppText>
-            <AppText variant="secondary" tone="secondary">카카오톡·브라우저·사진 앱에서 공유 버튼을 누르고 ‘킵온’을 고르면 이 화면으로 와요. 앱마다 보내 주는 형식이 달라서 일부는 링크나 텍스트만 전달될 수 있어요.</AppText>
-          </View>
-        </Card>
+        <InlineMessage tone="info" message="찾은 날짜·금액은 후보예요. 직접 확인하기 전까지는 알림을 만들지 않아요." />
         <AppText variant="caption" tone="tertiary">
           {settings.retainAttachments ? '이미지·PDF 원본은 앱 안에 복사해 보관해요. 설정에서 끌 수 있어요.' : '첨부 보관이 꺼져 있어 이미지·PDF 원본은 저장하지 않아요.'}
         </AppText>
       </ScreenScroll>
       <BottomBar>
-        <SecondaryButton label="취소" onPress={() => router.back()} style={{ flex: 1 }} />
-        <PrimaryButton label="정리하기" icon="sparkles-outline" onPress={analyze} loading={busy} disabled={!all.length} style={{ flex: 2 }} testID="analyze" />
+        <PrimaryButton label="정리하기" icon="sparkles-outline" onPress={analyze} loading={busy} disabled={!all.length} style={{ flex: 1 }} testID="analyze" />
       </BottomBar>
     </View>
   );

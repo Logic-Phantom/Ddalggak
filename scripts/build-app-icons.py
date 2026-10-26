@@ -9,8 +9,9 @@ from PIL import Image, ImageDraw
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / 'assets' / 'images'
-ACCENT = (47, 91, 211)  # tokens.ts lightColors.accent
-ACCENT_DEEP = (34, 68, 170)
+ACCENT = (41, 108, 90)  # icon gradient top (#296C5A)
+ACCENT_DEEP = (7, 78, 63)  # icon gradient bottom (#074E3F)
+GLYPH = (218, 250, 237, 255)  # mint glyph (#DAFAED)
 SS = 4  # supersampling factor for smooth edges
 
 
@@ -39,19 +40,24 @@ def glyph_mask(size: int, scale: float = 1.0) -> Image.Image:
     return mask
 
 
+def gradient(big: int) -> Image.Image:
+    g = Image.new('RGBA', (big, big))
+    d = ImageDraw.Draw(g)
+    for y in range(big):
+        t = y / big
+        d.line([(0, y), (big, y)], fill=tuple(round(a + (b - a) * t) for a, b in zip(ACCENT, ACCENT_DEEP)) + (255,))
+    return g
+
+
 def render(size: int, background, glyph_color, scale: float, rounded: bool = False) -> Image.Image:
     big = size * SS
     img = Image.new('RGBA', (big, big), (0, 0, 0, 0))
-    d = ImageDraw.Draw(img)
     if background is not None:
+        # Deep-green vertical gradient, full-bleed or as a rounded square.
+        mask = Image.new('L', (big, big), 255 if not rounded else 0)
         if rounded:
-            d.rounded_rectangle([0, 0, big - 1, big - 1], radius=int(big * 0.22), fill=background)
-        else:
-            # Subtle vertical gradient on the full-bleed square.
-            for y in range(big):
-                t = y / big
-                c = tuple(round(a + (b - a) * t) for a, b in zip(ACCENT, ACCENT_DEEP))
-                d.line([(0, y), (big, y)], fill=c + (255,))
+            ImageDraw.Draw(mask).rounded_rectangle([0, 0, big - 1, big - 1], radius=int(big * 0.24), fill=255)
+        img.paste(gradient(big), (0, 0), mask)
     img.paste(Image.new('RGBA', (big, big), glyph_color), (0, 0), glyph_mask(big, scale))
     return img.resize((size, size), Image.LANCZOS)
 
@@ -59,44 +65,21 @@ def render(size: int, background, glyph_color, scale: float, rounded: bool = Fal
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     white = (255, 255, 255, 255)
-    render(1024, ACCENT, white, 1.0).save(OUT / 'icon.png')
+    render(1024, ACCENT, GLYPH, 1.0).save(OUT / 'icon.png')
     # Adaptive icon: background color comes from app.json; keep the glyph inside the 66% safe zone.
-    render(1024, None, white, 0.62).save(OUT / 'android-icon-foreground.png')
+    render(1024, None, GLYPH, 0.62).save(OUT / 'android-icon-foreground.png')
     render(1024, None, white, 0.62).save(OUT / 'android-icon-monochrome.png')
-    render(512, ACCENT, white, 1.0, rounded=True).save(OUT / 'splash-icon.png')
-    render(48, ACCENT, white, 1.0, rounded=True).save(OUT / 'favicon.png')
+    render(512, ACCENT, GLYPH, 1.0, rounded=True).save(OUT / 'splash-icon.png')
+    render(48, ACCENT, GLYPH, 1.0, rounded=True).save(OUT / 'favicon.png')
     print(f'icons written to {OUT}')
 
 
 def build_store_assets() -> None:
-    """Google Play listing graphics: 512x512 icon and 1024x500 feature graphic (no alpha)."""
-    from PIL import ImageFont
-
+    """Google Play 512x512 icon (no alpha). The feature graphic is rendered by scripts/store-feature-graphic.mjs."""
     store = ROOT / 'docs' / 'store' / 'assets'
     store.mkdir(parents=True, exist_ok=True)
-    white = (255, 255, 255, 255)
-    render(512, ACCENT, white, 1.0).convert('RGB').save(store / 'play-icon-512.png')
-
-    w, h = 1024, 500
-    bg = Image.new('RGB', (w, h))
-    d = ImageDraw.Draw(bg)
-    for y in range(h):
-        t = y / h
-        d.line([(0, y), (w, y)], fill=tuple(round(a + (b - a) * t) for a, b in zip(ACCENT, ACCENT_DEEP)))
-    glyph = 340
-    bg.paste(Image.new('RGB', (glyph, glyph), (255, 255, 255)), (70, (h - glyph) // 2), glyph_mask(glyph * SS).resize((glyph, glyph), Image.LANCZOS))
-    fonts = ROOT / 'assets' / 'fonts'
-    title = ImageFont.truetype(str(fonts / 'Pretendard-Bold.otf'), 118)
-    tagline = ImageFont.truetype(str(fonts / 'Pretendard-SemiBold.otf'), 44)
-    note = ImageFont.truetype(str(fonts / 'Pretendard-Medium.otf'), 30)
-    x = 470
-    d.text((x, 92), '킵온', font=title, fill=(255, 255, 255))
-    d.text((x + d.textlength('킵온', font=title) + 22, 150), 'KeepOn', font=tagline, fill=(214, 225, 255))
-    d.text((x, 252), '저장한 정보, 놓치지 않게.', font=tagline, fill=(255, 255, 255))
-    d.text((x, 330), '공유하면 모이고, 기한은 알림으로', font=note, fill=(214, 225, 255))
-    d.text((x, 374), '로그인 없이 기기 안에만 저장', font=note, fill=(214, 225, 255))
-    bg.save(store / 'feature-graphic-1024x500.png')
-    print(f'store assets written to {store}')
+    render(512, ACCENT, GLYPH, 1.0).convert('RGB').save(store / 'play-icon-512.png')
+    print(f'store icon written to {store}')
 
 
 if __name__ == '__main__':

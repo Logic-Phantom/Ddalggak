@@ -54,7 +54,8 @@ npx eas-cli@latest submit --platform android --profile production
 | 🛠 | 쓰지 않는 `WRITE_EXTERNAL_STORAGE` 권한 | `blockedPermissions`로 제거 (prebuild 매니페스트에서 `tools:node="remove"` 확인) |
 | 🛠 | 광고 ID 권한이 라이브러리로 섞여 들어올 가능성 | `com.google.android.gms.permission.AD_ID` 차단 → 데이터 보안·광고 ID 설문 "아니요"와 일치 |
 | 🛠 | 스플래시 배경이 앱 배경과 약간 달라 전환 시 번쩍임 | 현재 토큰(`#F5F8F7` / 다크 `#0E1311`)으로 맞춤 |
-| 🛠 | 스토어 그래픽 없음 | `python scripts/build-app-icons.py --store` → `store/assets/` 512 아이콘·1024×500 그래픽 |
+| 🛠 | 스토어 그래픽 없음 | `python scripts/build-app-icons.py --store` → 512 아이콘, `node scripts/store-feature-graphic.mjs` → 1024×500 그래픽 (`store/assets/`) |
+| 🛠 | 디자인 개편(2026-10-26 시안) | 틸그린 토큰·둥근 사각형 카테고리·pill 탭, 홈·추가·확인·상세·알림·마이 화면 구조, 아이콘 색, 피처 그래픽·스크린샷 다시 만듦 (`DESIGN_SYSTEM.md`, D-021) |
 | 🛠 | 스크린샷·처리방침 페이지 없음 | `scripts/store-screenshots.mjs` → `store/screenshots/`, GitHub Pages 소개·처리방침 페이지 게시 |
 
 ## 4. 실기기 회귀 테스트 (새 빌드로)
@@ -65,6 +66,7 @@ npx eas-cli@latest submit --platform android --profile production
 | ⬜ | 앱 실행 중 알림 탭 | 해당 항목 상세로 이동 (한 번만) |
 | ⬜ | 마이 > 개인정보 처리방침 / 오픈소스 라이선스 | 내용 표시, 항목 펼치기 |
 | ⬜ | 마이 하단 버전·이름 | `킵온 1.0.0`, 홈 화면·공유 메뉴에 `킵온` 표시 |
+| ⬜ | 새 디자인 실기기 확인 | 아이콘(적응형·단색), 스플래시, 다크 모드, 큰 글자에서 상세의 값 행·코드 복사 버튼이 잘리지 않는지 |
 | ⬜ | 알림 권한 거부 후 알림 만들기 | "알림 탭에서 일정을 확인할 수 있어요" 문구 |
 | ⬜ | 사진 선택 (Android 13+ / 12 이하) | 권한 팝업 없이 시스템 선택기 |
 | ⬜ | 공유 수신: Chrome 링크, 카카오톡 텍스트, 갤러리 이미지, 파일 앱 PDF | `SHARE_RECEIVING_POC.md` 표 갱신 |

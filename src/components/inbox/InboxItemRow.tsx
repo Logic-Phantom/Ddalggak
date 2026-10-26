@@ -2,7 +2,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { Image } from 'expo-image';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { AppText, CategoryIcon, StatusBadge, elevation, radius, spacing, useCategoryTone, useColors } from '@/design-system';
+import { AppText, CategoryBadge, CategoryIcon, StatusBadge, elevation, radius, spacing, tileCornerRatio, useColors } from '@/design-system';
 import { CATEGORY_INFO, fieldLabel } from '@/domain/categories';
 import type { ExtractedField, InboxItem } from '@/domain/models';
 import { dDayLabel, diffDays, formatIsoDate, formatLocal, toYmd } from '@/utils/dates';
@@ -16,10 +16,9 @@ export interface InboxItemRowProps {
   onPress: () => void;
 }
 
-/** Library row: thumbnail (or category icon), title, the one date that matters, category on the right. */
+/** List row: thumbnail (or category tile), title, the one date that matters, category badge + D-day on the right. */
 export function InboxItemRow({ item, nextDate, thumbnail, onPress }: InboxItemRowProps) {
   const c = useColors();
-  const tone = useCategoryTone(item.category);
   const cat = CATEGORY_INFO[item.category];
   const days = nextDate?.normalizedValue ? diffDays(toYmd(new Date()), nextDate.normalizedValue) : null;
   const soon = days != null && days >= 0 && days <= 3;
@@ -39,16 +38,14 @@ export function InboxItemRow({ item, nextDate, thumbnail, onPress }: InboxItemRo
       {thumbnail ? (
         <Image source={{ uri: thumbnail }} style={styles.thumb} contentFit="cover" accessible={false} recyclingKey={thumbnail} />
       ) : (
-        <View style={[styles.thumb, { backgroundColor: tone.bg, alignItems: 'center', justifyContent: 'center' }]}>
-          <CategoryIcon category={item.category} size={40} />
-        </View>
+        <CategoryIcon category={item.category} size={THUMB} />
       )}
       <View style={{ flex: 1, gap: 3 }}>
         <View style={styles.titleRow}>
           <AppText variant="bodyStrong" numberOfLines={2} style={{ flex: 1 }}>{item.title}</AppText>
           {item.pinned ? <Ionicons name="pin" size={14} color={c.textTertiary} /> : null}
         </View>
-        <AppText variant="meta" numberOfLines={1} style={{ color: soon ? c.warning : c.textSecondary }}>
+        <AppText variant="meta" numberOfLines={1} style={{ color: soon ? c.warning : c.textTertiary }}>
           {dateLabel}
         </AppText>
         {item.needsReview || item.tags.length ? (
@@ -58,19 +55,21 @@ export function InboxItemRow({ item, nextDate, thumbnail, onPress }: InboxItemRo
           </View>
         ) : null}
       </View>
-      <View style={{ alignItems: 'flex-end', gap: 4 }}>
-        <AppText variant="caption" style={{ color: tone.fg }}>{cat.short}</AppText>
+      <View style={{ alignItems: 'flex-end', gap: 6 }}>
+        <CategoryBadge category={item.category} />
         {nextDate?.normalizedValue && days != null && days >= 0 ? (
-          <AppText variant="caption" style={{ color: soon ? c.warning : c.textTertiary, fontWeight: '700' }}>{dDayLabel(nextDate.normalizedValue)}</AppText>
+          <AppText variant="caption" style={{ color: soon ? c.error : c.textTertiary, fontWeight: '700' }}>{dDayLabel(nextDate.normalizedValue)}</AppText>
         ) : null}
       </View>
     </Pressable>
   );
 }
 
+const THUMB = 48;
+
 const styles = StyleSheet.create({
-  card: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, padding: spacing.sm, borderRadius: radius.card, borderWidth: 1 },
-  thumb: { width: 56, height: 56, borderRadius: radius.tile },
+  card: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingVertical: spacing.sm, paddingHorizontal: spacing.md, borderRadius: radius.card, borderWidth: StyleSheet.hairlineWidth },
+  thumb: { width: THUMB, height: THUMB, borderRadius: Math.round(THUMB * tileCornerRatio) },
   titleRow: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.xs },
   row: { flexDirection: 'row', alignItems: 'center', gap: spacing.xxs },
 });
