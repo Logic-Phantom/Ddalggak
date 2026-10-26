@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>딸깍 — 저장한 정보를, 딸깍 한 번에</title>
+<meta name="description" content="공유 메뉴로 보낸 링크·쿠폰·예약 정보를 모아 두고, 확인한 날짜로 알림을 받는 개인용 정보함.">
+<link rel="icon" href="icon.png">
+<style>
+:root { --bg:#ffffff; --fg:#1c2421; --muted:#5b6662; --line:#dfe5e2; --card:#f5f8f7; --accent:#2F5BD3; }
+@media (prefers-color-scheme: dark) { :root { --bg:#0e1311; --fg:#e8eeeb; --muted:#a3ada9; --line:#2a3330; --card:#161d1a; --accent:#8fa8ff; } }
+body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.7 -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif; }
+main { max-width:760px; margin:0 auto; padding:40px 16px 64px; }
+header { display:flex; gap:16px; align-items:center; }
+header img { width:72px; height:72px; border-radius:18px; }
+h1 { font-size:2rem; margin:0; } h2 { font-size:1.15rem; margin:2rem 0 .5rem; }
+.tag { color:var(--muted); margin:0; }
+ul { padding-left:1.2rem; }
+.card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:4px 18px; margin-top:1rem; }
+a { color:var(--accent); }
+footer { margin-top:3rem; color:var(--muted); font-size:.9rem; }
+</style>
+</head>
+<body><main>
+<header>
+  <img src="icon.png" alt="">
+  <div>
+    <h1>딸깍</h1>
+    <p class="tag">저장한 정보를, 딸깍 한 번에.</p>
+  </div>
+</header>
+
+<p>다른 앱에서 발견한 링크·텍스트·이미지·PDF를 공유 메뉴로 보내 두면, 날짜·금액·쿠폰 코드 같은 정보를 기기 안에서 후보로 찾아 주고, 사용자가 확인한 날짜로만 알림을 만들어 주는 개인용 정보함이에요.</p>
+
+<div class="card">
+<h2>기기 안에만 저장</h2>
+<ul>
+  <li>로그인·회원가입·서버가 없어요.</li>
+  <li>광고·분석·추적 도구를 쓰지 않아요.</li>
+  <li>공유된 링크의 웹페이지를 자동으로 불러오지 않아요.</li>
+</ul>
+</div>
+
+<h2>자주 묻는 질문</h2>
+<p><strong>공유 메뉴에 딸깍이 안 보여요.</strong><br>처음에는 공유 목록 끝의 ‘더보기’ 안에 있을 수 있어요. 한 번 쓰고 나면 앞쪽에 보이는 경우가 많아요.</p>
+<p><strong>이미지 속 글자도 읽나요?</strong><br>아직은 지원하지 않아요. 이미지는 그대로 저장되고, 제목과 날짜는 직접 입력할 수 있어요.</p>
+<p><strong>알림이 늦게 와요.</strong><br>방해 금지·절전 모드에 따라 알림이 늦거나 오지 않을 수 있어요. 앱의 알림 탭에서 다가오는 기한을 항상 확인할 수 있어요.</p>
+<p><strong>휴대폰을 바꾸면 데이터는요?</strong><br>설정 &gt; 내보내기로 JSON 파일을 만든 뒤 새 기기에서 가져오기 하세요. 이미지·PDF 첨부는 내보내기에 포함되지 않아요.</p>
+
+<h2>문의</h2>
+<p>이메일: <a href="mailto:dlacoaud96@gmail.com">dlacoaud96@gmail.com</a></p>
+
+<footer>
+  <a href="privacy-policy.html">개인정보 처리방침</a> · 개발자 임채명
+</footer>
+</main></body>
+</html>
