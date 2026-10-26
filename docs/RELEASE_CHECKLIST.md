@@ -7,7 +7,7 @@
 
 | | 항목 | 내용 |
 |---|---|---|
-| ⚠ | **앱 이름 충돌** | Google Play 생산성 카테고리에 「딸깍 - 링크, 스크린샷, 메모 한 곳에 저장」(TEAM FOR:e, 1만+ 다운로드, 비슷한 기능)이 이미 있음 → 이름 변경 권장. `BRAND_AND_TRADEMARKS.md` |
+| ✅ | 앱 이름 | "딸깍" 유지 결정(2026-10-26). 같은 카테고리에 「딸깍 - 링크, 스크린샷, 메모 한 곳에 저장」(TEAM FOR:e)이 있어 스토어 표시명은 `딸깍 - 링크·쿠폰·예약 정보함`으로 구분. 위험·완화는 `BRAND_AND_TRADEMARKS.md` |
 | ⬜ | 상표 검색 | KIPRIS 9류·42류 "딸깍"/새 이름 직접 검색 (자동 조회 실패) |
 | ✅ | 지원 이메일 | `dlacoaud96@gmail.com` — `app.json` `extra.supportEmail`, 마이 > 문의하기, 처리방침 9항 |
 | ✅ | 처리방침 게시 | https://logic-phantom.github.io/Ddalggak/privacy-policy.html (`gh-pages` 브랜치, 원본 `store/site/`). `app.json` `extra.privacyPolicyUrl` 설정 → 앱 처리방침 화면에 "웹에서 전체 처리방침 보기" 표시 |
