@@ -25,7 +25,7 @@
 - **결정**: `expo-sharing@58.0.20` config plugin(`ios.enabled`, `android.enabled`) + `useIncomingShare()`의 **raw payload**만 사용. `+native-intent.ts`에서 `ddalggak://expo-sharing` → `/capture?source=share`로 라우팅.
 - **이유**: 별도 네이티브 코드 없이 Android intent filter와 iOS Share Extension 타깃을 CNG로 생성 가능.
 - **resolved payload를 쓰지 않는 이유**: 문서상 URL 해석에 네트워크가 필요할 수 있음 → "웹페이지 자동 조회 금지" 원칙 위배.
-- **위험**: API가 `@experimental`. iOS는 App Group(`group.app.ddalggak.mobile`) 등록·서명이 필요하고 실기기 미검증. → `SHARE_RECEIVING_POC.md`.
+- **위험**: API가 `@experimental`. iOS는 App Group(`group.app.KeepOn.mobile`, D-022) 등록·서명이 필요하고 실기기 미검증. → `SHARE_RECEIVING_POC.md`.
 
 ## D-004 · OCR 엔진은 POC 전까지 "사용 불가" provider로 출시 (2026-10-24)
 - **결정**: `OcrProvider` 계약 + `unavailableOcrProvider`(가짜 텍스트를 만들지 않음). 이미지 캡처 시 "이 버전에서는 아직 OCR을 지원하지 않아요" 안내 후 수동 입력.
@@ -108,3 +108,9 @@
 - **지킨 것**: 앱에 없는 기능(태그 관리, 보낸 알림 기록, 알림 스위치, 목록의 금액)은 화면에 만들지 않음 — `DESIGN_SYSTEM.md` "시안과 다른 점". 확인 전 값으로 알림을 만들지 않는 규칙, 민감 번호 가림은 그대로.
 - **추가 동작**: 상세의 민감 번호에 "복사" 버튼(누를 때만 클립보드에 씀). 확인한 값은 체크 아이콘을 눌러 확인 취소.
 - **위험**: 웹 미리보기로만 확인함 — Android 실기기에서 그림자·아이콘·다크 모드 확인 필요.
+
+## D-022 · 패키지/번들 ID `app.ddalggak.mobile` → `app.KeepOn.mobile` (2026-10-27)
+- **결정**: 첫 Play 업로드 전에 Android 패키지와 iOS 번들 ID(공유 확장 `app.KeepOn.mobile.expo-sharing-extension`, App Group `group.app.KeepOn.mobile` 포함)를 `app.KeepOn.mobile`로 바꾼다. D-019의 "패키지 유지"를 뒤집는다.
+- **이유**: 소유자 요청 — 이름이 킵온으로 바뀌었으므로 식별자도 맞춤. Play에 아직 앱이 없어 지금이 바꿀 수 있는 마지막 시점(첫 업로드 후 변경 불가). Play Console "사용 가능한 패키지 이름" 확인(2026-10-27).
+- **영향**: EAS가 새 패키지용 업로드 키스토어를 새로 만들었다(옛 `app.ddalggak.mobile` 키는 사용 안 함). 옛 패키지로 설치한 개발·미리보기 빌드는 다른 앱으로 취급되어 데이터가 이어지지 않음(출시 전이라 사용자 없음). 대문자가 섞인 패키지는 Android에서 허용되지만 관례(소문자)와 다르다 — 소유자 선택.
+- **바꾸지 않은 것**: 스킴 `ddalggak`, EAS slug/projectId, DB·내보내기 형식 이름(사용자에게 보이지 않음).

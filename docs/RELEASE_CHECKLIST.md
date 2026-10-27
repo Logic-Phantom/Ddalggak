@@ -14,7 +14,7 @@
 | ✅ | 휴대전화 스크린샷 | `store/screenshots/` 7장, 1080×2160 (웹 미리보기, 가상 데이터). 실기기 화면으로 바꾸면 더 정확 |
 | ⬜ | 비공개 테스트 요건 | ⚠ 2023-11-13 이후 만든 **개인** 계정: 테스터 12명 이상 14일 연속 → `store/CLOSED_TEST_GUIDE.md` |
 | ⬜ | 실기기 회귀 확인 | 이번 수정분(아래 3장) 포함 AAB/APK를 폰에 설치해 확인 |
-| ✅ | 패키지명 | `app.ddalggak.mobile` 유지 결정 (2026-10-26). 앱 이름을 바꾸더라도 사용자에게는 보이지 않음 |
+| ✅ | 패키지명 | `app.KeepOn.mobile` (2026-10-27 변경, D-022) — Play "사용 가능" 확인 |
 
 ### 사이트 갱신 방법
 `docs/store/site/`를 고친 뒤 `gh-pages` 브랜치에 같은 파일을 커밋·푸시한다. 처리방침을 바꿀 때는 `PRIVACY_POLICY.md` → `site/privacy-policy.html` → 앱 `src/app/privacy.tsx` 시행일을 함께 바꾼다.
@@ -23,7 +23,7 @@
 
 | | 항목 | 상태 |
 |---|---|---|
-| ✅ | 패키지명 | `app.ddalggak.mobile` (유지 결정) — 첫 업로드 후 바꿀 수 없음 |
+| ✅ | 패키지명 | `app.KeepOn.mobile` (D-022) — 첫 업로드 후 바꿀 수 없음. 새 패키지용 키스토어를 EAS가 생성 |
 | 🛠 | 버전 | `1.0.0` (app.json·package.json). versionCode는 EAS 원격 관리(`appVersionSource: remote`, production `autoIncrement`) |
 | ✅ | 타깃 SDK | 36 (Expo SDK 58 / RN 0.88 기본) |
 | ✅ | 서명 | EAS 서버 보관 키스토어 = 업로드 키. Play App Signing 사용(신규 앱 기본) |
@@ -74,6 +74,8 @@ npx eas-cli@latest submit --platform android --profile production
 | ⬜ | 다크 모드·글자 크게·TalkBack 기본 흐름 | 잘림·읽기 순서 문제 없음 |
 
 ## 5. Play Console 작업 순서
+
+> 2026-10-27 진행: 1~5 완료(앱 ID 4976000210034281870). 내부 테스트 `2 (1.0.0)` 게시, 참여 링크 https://play.google.com/apps/internaltest/4701251179244572193 . 다음은 폰 설치 확인(4장) → 6. 자세한 값은 README 작업 내역 2026-10-27.
 
 1. 앱 만들기: 이름, 기본 언어 한국어, 앱, 무료, 선언 동의
 2. 앱 콘텐츠: `PLAY_CONSOLE_FORMS.md` 순서대로 (처리방침 URL → 광고 → 앱 액세스 → 콘텐츠 등급 → 타겟층 → 데이터 보안 → 광고 ID → 정부/금융/건강/뉴스)

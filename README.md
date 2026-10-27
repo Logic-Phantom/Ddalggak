@@ -2,7 +2,7 @@
 
 > 저장한 정보, 놓치지 않게.
 
-앱 이름은 2026-10-26에 "딸깍"에서 킵온(KeepOn)으로 바뀌었다(`docs/BRAND_AND_TRADEMARKS.md`, D-019·D-020). 저장소는 `Logic-Phantom/KeepOn`. 패키지(`app.ddalggak.mobile`)·스킴·DB 이름은 그대로다.
+앱 이름은 2026-10-26에 "딸깍"에서 킵온(KeepOn)으로 바뀌었다(`docs/BRAND_AND_TRADEMARKS.md`, D-019·D-020). 저장소는 `Logic-Phantom/KeepOn`. 패키지는 2026-10-27 `app.KeepOn.mobile`로 바뀌었고(D-022), 스킴·DB 이름은 그대로다.
 
 다른 앱에서 발견한 링크·텍스트·이미지·문서를 공유 메뉴로 보내 두면, 기기 안에서 날짜·금액·쿠폰 코드 같은 정보를 **후보로** 찾아 주고, 사용자가 확인한 날짜로만 알림을 만들어 주는 개인용 생활정보 인박스입니다.
 
@@ -298,3 +298,18 @@ docs/store/          Play 등록정보 원고, 정책 답변, 처리방침, 비�
 - 아이콘: 같은 트레이 글리프를 틸그린 그라데이션 + 민트로 다시 그림(적응형 배경 `#165D4C`), 알림·웹 테마 색 변경. 피처 그래픽은 `scripts/store-feature-graphic.mjs`(HTML + Chrome)로 시안처럼 다시 만듦. 스크린샷 7장 다시 촬영, 소개 페이지 아이콘·색 갱신.
 - 시안에 있지만 앱에 없는 기능(태그 관리, 보낸 알림 기록, 알림 스위치, 목록 금액)은 만들지 않음 → `docs/DESIGN_SYSTEM.md`.
 - 실행: `npx tsc --noEmit` 통과, `npx expo lint` 통과, `npx jest` 127/127, 웹 미리보기(360×720@3x)로 7개 화면 확인. 실기기 미확인.
+
+### 2026-10-27 — 출시 전 재점검, 패키지 이름 변경 (D-022), Play Console 등록 + 내부 테스트 게시
+
+- **점검**: `npx tsc --noEmit` 통과, `npx expo lint` 통과, `npx jest` 127/127. `npx expo export --platform android --source-maps` → `license-audit.mjs`: 번들 68개(MIT 65, ISC 1, MIT AND Apache-2.0 1, OFL-1.1 1), 허용 목록 밖 0개, `oss-licenses.json` 변화 없음. 처리방침·소개 페이지 200.
+- **웹 미리보기(375×812)**: 온보딩 → 홈 → 텍스트 추가(가상 예약 문자) → 날짜·금액·예약번호 후보 표시, 예약번호 가림 → 날짜 확인 후 저장 → 상세 → 알림 탭 D-6 표시 → 마이(버전 `킵온 1.0.0`, 처리방침·오픈소스·문의). 콘솔 오류 없음. 공유 수신·기기 알림은 웹에서 확인 불가(실기기 필요).
+- **스토어 자료**: 아이콘 512, 피처 그래픽 1024×500(알파 없음), 스크린샷 7장 1080×2160 — Play 사양 충족 확인, 새로 만들 것 없음.
+- **패키지**: `app.ddalggak.mobile` → `app.KeepOn.mobile`(iOS 번들·공유 확장·App Group 포함, D-022). Play Console "사용 가능한 패키지 이름" 확인. 옛 패키지로 시작한 EAS 빌드는 취소.
+- **EAS 프로덕션 빌드**: 새 패키지로 키스토어 새로 생성 → 성공, versionCode 2 / 1.0.0, AAB 75.5MB: https://expo.dev/accounts/lcm2/projects/ddalggak/builds/13e990ba-1347-40dd-b592-dda83c5acf1f . AAB 매니페스트에서 `app.KeepOn.mobile`, `POST_NOTIFICATIONS` 확인, AD_ID·READ_MEDIA_*·WRITE_EXTERNAL_STORAGE·CAMERA·RECORD_AUDIO 없음.
+- **Play Console**(소유자 Chrome, 계정 Forest_LIM): 앱 만들기(소유자가 선언 체크) → 앱 ID 4976000210034281870, 이름 `킵온(KeepOn) - 링크·쿠폰·예약 정보함`, 패키지 `app.KeepOn.mobile`, 한국어, 앱, 무료.
+  - 기본 스토어 등록정보: `PLAY_STORE_LISTING.md`의 간단한·자세한 설명, 아이콘 512, 그래픽 1024×500, 스크린샷 01→07(한 번에 올리면 순서가 섞여 한 장씩 다시 올림). AI 애셋 선언 "라벨 지정 안 함"(이미지는 스크립트 렌더링·앱 화면 캡처, 생성형 이미지 없음).
+  - 스토어 설정: 카테고리 생산성, 이메일 dlacoaud96@gmail.com, 웹사이트 https://logic-phantom.github.io/KeepOn/
+  - 앱 콘텐츠 9개 저장: 처리방침 URL, 광고 없음, 로그인 세부정보 "아니요"(제한된 부분 없음), 타겟 만 18세 이상, 데이터 보안 수집 없음·공유 없음, 광고 ID 사용 안 함, 정부 앱 아니요, 금융 기능 없음, 건강 기능 없음. 콘텐츠 등급(IARC 약관은 소유자 동의, 카테고리 "다른 모든 앱 유형", 9문항 모두 아니요) → 대한민국 3세 이상, ESRB 전체이용가, PEGI 3. 앱 콘텐츠 남은 선언 없음.
+  - 내부 테스트: 테스터 목록 "CutPick 내부 테스터"(16명) 재사용, 출시 노트 입력. AAB(75MB)는 Chrome 확장 업로드 한도(10MB)를 넘어 소유자가 직접 업로드(`~/Downloads/keepon-1.0.0-vc2.aab`) → 버전 `2 (1.0.0)`, API 24+, 타겟 SDK 36, 신규 설치 약 19MB, 오류·경고 없음 → 저장 및 출시 → "내부 테스터에게 제공됨". 참여 링크: https://play.google.com/apps/internaltest/4701251179244572193 (심사 전이라 이름이 `app.KeepOn.mobile (unreviewed)`로 보임).
+- **미검증**: 내부 테스트 링크로 실기기 설치·실행.
+- **남은 일**: 내부 테스트 설치 → 실기기 회귀 → 비공개 테스트 12명×14일 → 프로덕션 신청. KIPRIS 상표 검색 미완료.

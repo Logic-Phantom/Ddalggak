@@ -5,7 +5,7 @@
 ## 구현 방식
 - `expo-sharing@58.0.20` config plugin (`app.json`):
   - Android: `singleShareMimeTypes = text/plain, image/*, application/pdf`, `multipleShareMimeTypes = image/*` → MainActivity에 `ACTION_SEND`/`ACTION_SEND_MULTIPLE` intent filter 생성.
-  - iOS: Share Extension 타깃(`expo-sharing-extension`, 배포 타깃 16.4) 생성, activation rule: 텍스트, 웹 URL 1개, 이미지 5개, 파일 3개. App Group 기본값 `group.app.ddalggak.mobile`.
+  - iOS: Share Extension 타깃(`expo-sharing-extension`, 배포 타깃 16.4) 생성, activation rule: 텍스트, 웹 URL 1개, 이미지 5개, 파일 3개. App Group `group.app.KeepOn.mobile` (D-022, 이전 `group.app.ddalggak.mobile`).
 - 앱은 `ddalggak://expo-sharing`으로 열리고 `+native-intent.ts`가 `/capture?source=share`로 보냄.
 - `useIncomingShare().sharedPayloads`(raw)만 읽고, 화면에 반영한 뒤 `clearSharedPayloads()`로 비움(재실행 시 중복 수신 방지).
 - **사용하지 않는 것**: `getResolvedSharedPayloadsAsync()` — URL 해석에 네트워크가 쓰일 수 있음.

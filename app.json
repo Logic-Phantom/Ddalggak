@@ -8,14 +8,14 @@
     "scheme": "ddalggak",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "bundleIdentifier": "app.ddalggak.mobile",
+      "bundleIdentifier": "app.KeepOn.mobile",
       "supportsTablet": true,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
-      "package": "app.ddalggak.mobile",
+      "package": "app.KeepOn.mobile",
       "adaptiveIcon": {
         "backgroundColor": "#165D4C",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -121,10 +121,10 @@
               "appExtensions": [
                 {
                   "targetName": "expo-sharing-extension",
-                  "bundleIdentifier": "app.ddalggak.mobile.expo-sharing-extension",
+                  "bundleIdentifier": "app.KeepOn.mobile.expo-sharing-extension",
                   "entitlements": {
                     "com.apple.security.application-groups": [
-                      "group.app.ddalggak.mobile"
+                      "group.app.KeepOn.mobile"
                     ]
                   }
                 }
